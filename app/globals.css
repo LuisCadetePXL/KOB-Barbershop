@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* KOB brand colours */
+  --color-kob-black:    #0A0A0A;
+  --color-kob-dark:     #141414;
+  --color-kob-surface:  #1C1C1C;
+  --color-kob-border:   #2A2A2A;
+  --color-kob-red:      #C41E3A;
+  --color-kob-red-dark: #A01830;
+  --color-kob-white:    #F5F5F5;
+  --color-kob-muted:    #888888;
+
+  /* Typography */
+  --font-display: var(--font-playfair);
+  --font-body:    var(--font-inter);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Tailwind v4 preflight no longer sets cursor:pointer on buttons (v3 did).
+   Add it back globally so buttons never show a text cursor. */
+button {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Make the native date/time picker calendar icon white on dark backgrounds */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0A0A0A;
+  color: #F5F5F5;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

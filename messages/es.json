@@ -1,0 +1,133 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Sobre nosotros",
+    "team": "Equipo",
+    "prices": "Precios",
+    "contact": "Contacto",
+    "bookNow": "Reservar"
+  },
+  "home": {
+    "location": "Leopoldsburg · Bélgica",
+    "heading1": "King of",
+    "heading2": "Barber",
+    "subtitle": "Cortes premium, fades y arreglo de barba — trabajo artesanal de un equipo que cuida cada detalle.",
+    "ctaBook": "Reservar",
+    "ctaStory": "Nuestra historia",
+    "scroll": "Desplazar",
+    "teaserTeam": {
+      "title": "Nuestro equipo",
+      "body": "Un pequeño equipo de barberos con experiencia — cada uno con su propio estilo y especialidad.",
+      "cta": "Conoce al equipo"
+    },
+    "teaserPrices": {
+      "title": "Servicios y precios",
+      "body": "Cortes clásicos, fades, recortes de barba y paquetes combinados. Precios transparentes, sin sorpresas.",
+      "cta": "Ver precios"
+    },
+    "teaserContact": {
+      "title": "Encuéntranos",
+      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Abierto seis días a la semana — se aceptan clientes sin cita.",
+      "cta": "Cómo llegar"
+    }
+  },
+  "about": {
+    "pageTitle": "Sobre nosotros",
+    "sectionLabel": "Nuestra historia",
+    "heading": "Más que un corte de pelo. Una experiencia.",
+    "photoPlaceholder": "Foto próximamente",
+    "text": "King of Barber nació de una convicción sencilla: todo hombre merece un gran corte de pelo. Ubicados en el corazón de Leopoldsburg, hemos creado un espacio donde la precisión se une a la relajación — donde el oficio tradicional de la barbería se combina con una visión moderna y sofisticada. Nuestro equipo de hábiles barberos se enorgullece de cada detalle, desde la primera consulta hasta el acabado final. Ya sea que busques un corte clásico, un fade limpio o una barba que llame la atención, saldrás de King of Barber luciendo y sintiéndote en tu mejor momento. Los clientes sin cita siempre son bienvenidos."
+  },
+  "team": {
+    "pageTitle": "Nuestro equipo",
+    "intro": "Un equipo unido de hábiles barberos — cada uno aportando su propia técnica y personalidad.",
+    "role": "Barbero",
+    "empty": "Información del equipo próximamente."
+  },
+  "prices": {
+    "pageTitle": "Servicios y precios",
+    "intro": "Todos los precios incluyen acabado con toalla caliente. Se aceptan clientes sin cita — se recomienda reservar los fines de semana.",
+    "minutes": "min",
+    "disclaimer": "Los precios son valores provisionales — precios definitivos próximamente.",
+    "empty": "Precios próximamente."
+  },
+  "contact": {
+    "pageTitle": "Encuéntranos",
+    "openingHours": "Horario",
+    "contactInfo": "Contacto",
+    "location": "Ubicación",
+    "closed": "Cerrado",
+    "hoursDisclaimer": "* El horario es provisional — horario definitivo próximamente.",
+    "mapPlaceholder": "Mapa de Google — Place ID pendiente de confirmación.",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "instagram": "Instagram",
+    "days": {
+      "sunday": "Domingo",
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado"
+    }
+  },
+  "book": {
+    "pageTitle": "Reservar cita",
+    "back": "Volver",
+    "next": "Siguiente",
+    "steps": {
+      "service": "Servicio",
+      "barber": "Barbero",
+      "datetime": "Fecha y hora",
+      "contact": "Datos",
+      "confirm": "Confirmar"
+    },
+    "service": {
+      "heading": "Elige un servicio",
+      "minutes": "min"
+    },
+    "barber": {
+      "heading": "Elige un barbero"
+    },
+    "datetime": {
+      "heading": "Elige fecha y hora",
+      "dateLabel": "Selecciona una fecha",
+      "noSlots": "No hay horarios disponibles en esta fecha.",
+      "closedDay": "La barbería está cerrada en esta fecha.",
+      "loading": "Comprobando disponibilidad…"
+    },
+    "contact": {
+      "heading": "Tus datos",
+      "nameLabel": "Tu nombre",
+      "namePlaceholder": "Nombre completo",
+      "phoneLabel": "Número de teléfono",
+      "phonePlaceholder": "+32 476 00 00 00",
+      "phoneHint": "Formato internacional recomendado — necesario para recordatorios de citas.",
+      "phoneError": "Introduce un número de teléfono válido (p. ej. +32 476 00 00 00 o 0476 00 00 00)."
+    },
+    "confirm": {
+      "heading": "Confirma tu reserva",
+      "service": "Servicio",
+      "barber": "Barbero",
+      "date": "Fecha",
+      "time": "Hora",
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "submit": "Confirmar reserva",
+      "submitting": "Confirmando…",
+      "slotTaken": "Alguien acaba de reservar este horario. Por favor, elige otro."
+    },
+    "done": {
+      "heading": "¡Reserva confirmada!",
+      "body": "Estaremos encantados de recibirte. Llámanos si necesitas cancelar.",
+      "backHome": "Volver al inicio"
+    }
+  },
+  "footer": {
+    "tagline": "Barbería premium en Leopoldsburg.",
+    "navigation": "Navegación",
+    "visitUs": "Visítanos",
+    "copyright": "Todos los derechos reservados."
+  }
+}

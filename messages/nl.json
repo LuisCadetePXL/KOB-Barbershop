@@ -1,0 +1,133 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "Over ons",
+    "team": "Team",
+    "prices": "Prijzen",
+    "contact": "Contact",
+    "bookNow": "Boek nu"
+  },
+  "home": {
+    "location": "Leopoldsburg · België",
+    "heading1": "King of",
+    "heading2": "Barber",
+    "subtitle": "Premium knippen, fades en baardzorg — vakwerk van een team dat oog heeft voor elk detail.",
+    "ctaBook": "Boek nu",
+    "ctaStory": "Ons verhaal",
+    "scroll": "Scroll",
+    "teaserTeam": {
+      "title": "Ons team",
+      "body": "Een klein team van ervaren kappers — elk met hun eigen stijl en specialiteit.",
+      "cta": "Ontmoet het team"
+    },
+    "teaserPrices": {
+      "title": "Diensten & prijzen",
+      "body": "Klassieke knippen, fades, baardtrims en combopakketten. Transparante prijzen, geen verrassingen.",
+      "cta": "Bekijk prijzen"
+    },
+    "teaserContact": {
+      "title": "Vind ons",
+      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Zes dagen per week open — inlopen welkom.",
+      "cta": "Routebeschrijving"
+    }
+  },
+  "about": {
+    "pageTitle": "Over ons",
+    "sectionLabel": "Ons verhaal",
+    "heading": "Meer dan een knipbeurt. Een ervaring.",
+    "photoPlaceholder": "Foto volgt binnenkort",
+    "text": "King of Barber is ontstaan vanuit een eenvoudige overtuiging: elke man verdient een geweldige knipbeurt. Gevestigd in het hart van Leopoldsburg, hebben we een plek gebouwd waar precisie en ontspanning samenkomen — waar het traditionele kappersvak wordt gecombineerd met een scherp modern oog. Ons team van vaardige kappers is trots op elk detail, van het eerste gesprek tot de laatste afwerking. Of je nu zoekt naar een klassieke knipbeurt, een strakke fade of een baard die opvalt, je verlaat King of Barber er op je best uitziend en zo voelend. Inlopen altijd welkom."
+  },
+  "team": {
+    "pageTitle": "Ons team",
+    "intro": "Een hecht team van vaardige kappers — elk met hun eigen techniek en persoonlijkheid.",
+    "role": "Kapper",
+    "empty": "Teaminformatie volgt binnenkort."
+  },
+  "prices": {
+    "pageTitle": "Diensten & prijzen",
+    "intro": "Alle prijzen zijn inclusief een warm handdoekfinish. Inlopen welkom — afspraak aanbevolen in het weekend.",
+    "minutes": "min",
+    "disclaimer": "Prijzen zijn voorlopige waarden — definitieve prijzen volgen binnenkort.",
+    "empty": "Prijzen volgen binnenkort."
+  },
+  "contact": {
+    "pageTitle": "Vind ons",
+    "openingHours": "Openingsuren",
+    "contactInfo": "Contact",
+    "location": "Locatie",
+    "closed": "Gesloten",
+    "hoursDisclaimer": "* Uren zijn voorlopig — definitieve openingsuren volgen binnenkort.",
+    "mapPlaceholder": "Google Maps embed — Place ID nog te bevestigen.",
+    "address": "Adres",
+    "phone": "Telefoon",
+    "instagram": "Instagram",
+    "days": {
+      "sunday": "Zondag",
+      "monday": "Maandag",
+      "tuesday": "Dinsdag",
+      "wednesday": "Woensdag",
+      "thursday": "Donderdag",
+      "friday": "Vrijdag",
+      "saturday": "Zaterdag"
+    }
+  },
+  "book": {
+    "pageTitle": "Afspraak maken",
+    "back": "Terug",
+    "next": "Volgende",
+    "steps": {
+      "service": "Dienst",
+      "barber": "Kapper",
+      "datetime": "Datum & tijd",
+      "contact": "Gegevens",
+      "confirm": "Bevestigen"
+    },
+    "service": {
+      "heading": "Kies een dienst",
+      "minutes": "min"
+    },
+    "barber": {
+      "heading": "Kies een kapper"
+    },
+    "datetime": {
+      "heading": "Kies datum & tijd",
+      "dateLabel": "Kies een datum",
+      "noSlots": "Geen beschikbare tijdsloten op deze datum.",
+      "closedDay": "De zaak is gesloten op deze datum.",
+      "loading": "Beschikbaarheid ophalen…"
+    },
+    "contact": {
+      "heading": "Jouw gegevens",
+      "nameLabel": "Jouw naam",
+      "namePlaceholder": "Volledige naam",
+      "phoneLabel": "Telefoonnummer",
+      "phonePlaceholder": "+32 476 00 00 00",
+      "phoneHint": "Internationaal formaat aanbevolen — nodig voor afspraakherinneringen.",
+      "phoneError": "Voer een geldig telefoonnummer in (bijv. +32 476 00 00 00 of 0476 00 00 00)."
+    },
+    "confirm": {
+      "heading": "Bevestig je afspraak",
+      "service": "Dienst",
+      "barber": "Kapper",
+      "date": "Datum",
+      "time": "Tijdstip",
+      "name": "Naam",
+      "phone": "Telefoon",
+      "submit": "Afspraak bevestigen",
+      "submitting": "Bevestigen…",
+      "slotTaken": "Dit tijdslot is net geboekt door iemand anders. Kies een ander tijdstip."
+    },
+    "done": {
+      "heading": "Afspraak bevestigd!",
+      "body": "We zien je graag. Bel ons als je moet annuleren.",
+      "backHome": "Terug naar home"
+    }
+  },
+  "footer": {
+    "tagline": "Premium barbershop in Leopoldsburg.",
+    "navigation": "Navigatie",
+    "visitUs": "Bezoek ons",
+    "copyright": "Alle rechten voorbehouden."
+  }
+}

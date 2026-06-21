@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# King of Barber — Barbershop Website
 
-## Getting Started
+Next.js (App Router) · TypeScript · Tailwind CSS · Supabase · next-intl
 
-First, run the development server:
+---
+
+## Supabase project aanmaken en migraties uitvoeren
+
+### 1. Supabase project aanmaken
+
+1. Ga naar [supabase.com](https://supabase.com) en log in
+2. Klik **New project**
+3. Kies een naam (bv. `kob-barbershop`), regio **West EU (Frankfurt)**, stel een database-wachtwoord in
+4. Wacht tot het project klaar is (~1 minuut)
+
+### 2. API keys ophalen
+
+Ga naar **Project Settings → API** en kopieer:
+- **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+- **anon / public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
+
+Maak een `.env.local` aan op basis van `.env.local.example` en vul deze waarden in.
+
+### 3. Migraties uitvoeren
+
+De migratie-bestanden staan in `supabase/migrations/`. Je kunt ze uitvoeren via de Supabase SQL Editor:
+
+1. Ga naar **SQL Editor** in het Supabase dashboard
+2. Open `supabase/migrations/0001_initial_schema.sql`, kopieer de inhoud en klik **Run**
+3. Open `supabase/migrations/0002_seed_defaults.sql`, kopieer de inhoud en klik **Run**
+
+**Of** via de Supabase CLI (optioneel, voor later):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx supabase link --project-ref jouw-project-id
+npx supabase db push
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 4. Admin-gebruiker aanmaken
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Na de migraties: maak een gebruiker aan via **Authentication → Users → Add user** in het dashboard. Voer daarna dit SQL-snippet uit in de SQL Editor om de rol in te stellen:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sql
+insert into public.profiles (id, role)
+values ('<uuid-van-de-gebruiker>', 'developer');
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Development starten
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cp .env.local.example .env.local
+# vul .env.local in met je Supabase keys
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+App draait op [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Mappenstructuur
+
+```
+app/
+  (public)/        # publieke site (/nl, /en, /es) — fase 2-3
+  admin/           # admin paneel — fase 4-6
+  api/             # API routes
+lib/
+  supabase/
+    client.ts      # browser client (client components)
+    server.ts      # server client (server components, API routes)
+messages/          # next-intl vertaalbestanden (nl.json, en.json, es.json) — fase 3
+supabase/
+  migrations/      # SQL migraties
+types/
+  database.ts      # TypeScript types voor alle tabellen
+```
+
+---
+
+## Bouwvolgorde (fasering)
+
+1. ✅ **Project setup + datamodel** — Next.js skeleton, Supabase schema
+2. Publieke site, statisch — pagina's met placeholder content
+3. Meertaligheid — next-intl routing, taalwisselaar
+4. Auth + admin skelet — login, middleware, rol-onderscheid
+5. Admin CRUD — barbers, prijzen, openingsuren, sluitingsdagen
+6. Auto-vertaling — DeepL API integratie
+7. Booking flow — service/barber/tijdslot kiezen
+8. Google Calendar integratie
+9. Twilio WhatsApp integratie
+10. Polish, testing, deploy

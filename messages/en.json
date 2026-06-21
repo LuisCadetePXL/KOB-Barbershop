@@ -1,0 +1,133 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "team": "Team",
+    "prices": "Prices",
+    "contact": "Contact",
+    "bookNow": "Book Now"
+  },
+  "home": {
+    "location": "Leopoldsburg · Belgium",
+    "heading1": "King of",
+    "heading2": "Barber",
+    "subtitle": "Premium cuts, fades and beard work — crafted by a team that takes pride in every detail.",
+    "ctaBook": "Book Now",
+    "ctaStory": "Our Story",
+    "scroll": "Scroll",
+    "teaserTeam": {
+      "title": "Our Team",
+      "body": "A small crew of experienced barbers — each with their own style and specialty.",
+      "cta": "Meet the barbers"
+    },
+    "teaserPrices": {
+      "title": "Services & Prices",
+      "body": "Classic cuts, fades, beard trims and combo deals. Transparent pricing, no surprises.",
+      "cta": "View prices"
+    },
+    "teaserContact": {
+      "title": "Find Us",
+      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Open six days a week — walk-ins welcome.",
+      "cta": "Get directions"
+    }
+  },
+  "about": {
+    "pageTitle": "About Us",
+    "sectionLabel": "Our Story",
+    "heading": "More than a haircut. An experience.",
+    "photoPlaceholder": "Photo coming soon",
+    "text": "King of Barber was born out of a simple conviction: every man deserves a great cut. Based in the heart of Leopoldsburg, we've built a space where precision meets relaxation — where traditional barbering craft is paired with a sharp modern eye. Our team of skilled barbers takes pride in every detail, from the first consultation to the final finish. Whether you're after a classic cut, a clean fade or a beard that turns heads, you'll leave King of Barber looking and feeling your best. Walk-ins are always welcome."
+  },
+  "team": {
+    "pageTitle": "Our Team",
+    "intro": "A tight-knit crew of skilled barbers — each bringing their own technique and personality to the chair.",
+    "role": "Barber",
+    "empty": "Team info coming soon."
+  },
+  "prices": {
+    "pageTitle": "Services & Prices",
+    "intro": "All prices include a hot towel finish. Walk-ins welcome — appointments recommended on weekends.",
+    "minutes": "min",
+    "disclaimer": "Prices are placeholder values — confirmed pricing coming soon.",
+    "empty": "Prices coming soon."
+  },
+  "contact": {
+    "pageTitle": "Find Us",
+    "openingHours": "Opening Hours",
+    "contactInfo": "Contact",
+    "location": "Location",
+    "closed": "Closed",
+    "hoursDisclaimer": "* Hours are placeholder — confirmed hours coming soon.",
+    "mapPlaceholder": "Google Maps embed — Place ID to be confirmed.",
+    "address": "Address",
+    "phone": "Phone",
+    "instagram": "Instagram",
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    }
+  },
+  "book": {
+    "pageTitle": "Book an appointment",
+    "back": "Back",
+    "next": "Next",
+    "steps": {
+      "service": "Service",
+      "barber": "Barber",
+      "datetime": "Date & Time",
+      "contact": "Details",
+      "confirm": "Confirm"
+    },
+    "service": {
+      "heading": "Choose a service",
+      "minutes": "min"
+    },
+    "barber": {
+      "heading": "Choose a barber"
+    },
+    "datetime": {
+      "heading": "Choose a date & time",
+      "dateLabel": "Select a date",
+      "noSlots": "No available slots on this date.",
+      "closedDay": "The shop is closed on this date.",
+      "loading": "Checking availability…"
+    },
+    "contact": {
+      "heading": "Your details",
+      "nameLabel": "Your name",
+      "namePlaceholder": "Full name",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "+32 476 00 00 00",
+      "phoneHint": "International format recommended — needed for appointment reminders.",
+      "phoneError": "Please enter a valid phone number (e.g. +32 476 00 00 00 or 0476 00 00 00)."
+    },
+    "confirm": {
+      "heading": "Confirm your booking",
+      "service": "Service",
+      "barber": "Barber",
+      "date": "Date",
+      "time": "Time",
+      "name": "Name",
+      "phone": "Phone",
+      "submit": "Confirm booking",
+      "submitting": "Confirming…",
+      "slotTaken": "This time slot was just booked by someone else. Please choose another time."
+    },
+    "done": {
+      "heading": "Booking confirmed!",
+      "body": "We look forward to seeing you. If you need to cancel, please give us a call.",
+      "backHome": "Back to home"
+    }
+  },
+  "footer": {
+    "tagline": "Premium barbershop in Leopoldsburg.",
+    "navigation": "Navigation",
+    "visitUs": "Visit Us",
+    "copyright": "All rights reserved."
+  }
+}
