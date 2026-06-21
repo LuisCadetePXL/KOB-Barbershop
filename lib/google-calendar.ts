@@ -29,6 +29,10 @@ export async function createCalendarEvent(params: {
   startTime: Date
   endTime: Date
 }): Promise<string | null> {
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
+    console.error('[KOB Calendar] createCalendarEvent skipped: GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY not set in environment.')
+    return null
+  }
   try {
     const cal = getCalendar()
     const res = await cal.events.insert({
@@ -45,8 +49,10 @@ export async function createCalendarEvent(params: {
         },
       },
     })
+    console.log(`[KOB Calendar] Event created: ${res.data.id} in calendar ${params.calendarId}`)
     return res.data.id ?? null
-  } catch {
+  } catch (err) {
+    console.error('[KOB Calendar] createCalendarEvent failed:', err)
     return null
   }
 }

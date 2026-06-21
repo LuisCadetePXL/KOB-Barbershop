@@ -21,7 +21,7 @@ export default async function AppointmentsPage() {
   const { data: appointments } = await supabase
     .from('appointments')
     .select('id, status, source, start_time, end_time, customer_name, customer_phone, google_calendar_event_id, created_at, barbers(name), services(name_en)')
-    .order('start_time', { ascending: false })
+    .order('start_time', { ascending: true })
     .limit(200)
 
   return <AppointmentsClient appointments={(appointments ?? []) as unknown as AppointmentRow[]} />

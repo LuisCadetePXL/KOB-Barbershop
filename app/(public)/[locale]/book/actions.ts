@@ -94,7 +94,23 @@ export async function createAppointment(
   }
 
   const appointmentId = randomUUID()
-  const startTime = new Date(`${input.date}T${input.time}:00.000Z`)
+  // Convert Europe/Brussels wall-clock time to UTC (handles DST automatically).
+  // Step 1: treat the chosen time as UTC naively to get a reference instant.
+  // Step 2: ask Intl what Brussels shows at that instant (sv-SE gives "YYYY-MM-DD HH:MM:SS").
+  // Step 3: parse that string explicitly as UTC (append Z) → brussels offset in ms.
+  // Step 4: subtract the offset to get the real UTC instant.
+  // e.g. 12:00 Brussels (UTC+2): naiveUtc=12:00Z, Brussels shows 14:00, offset=+2h → result=10:00Z ✓
+  // Parsing via sv-SE+Z avoids the new Date(localeString) local-timezone trap.
+  const naiveUtc = new Date(`${input.date}T${input.time}:00Z`)
+  const brusselsString = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Brussels',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  }).format(naiveUtc) // → "2026-06-21 14:00:00"
+  const brusselsAsUtc = new Date(brusselsString.replace(' ', 'T') + 'Z')
+  const offsetMs = brusselsAsUtc.getTime() - naiveUtc.getTime()
+  const startTime = new Date(naiveUtc.getTime() - offsetMs)
   const endTime = new Date(startTime.getTime() + input.durationMinutes * 60_000)
 
   const { error } = await supabase
