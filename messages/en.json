@@ -128,6 +128,10 @@
       "summaryTime": "Time"
     }
   },
+  "reviews": {
+    "heading": "What customers say",
+    "totalReviews": "reviews"
+  },
   "footer": {
     "tagline": "Premium barbershop in Leopoldsburg.",
     "navigation": "Navigation",

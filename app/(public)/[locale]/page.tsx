@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
-import { setRequestLocale } from 'next-intl/server'
+import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { getGoogleReviews, type PlaceReview } from '@/lib/google-reviews'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -81,6 +82,9 @@ function HomeContent() {
           </div>
         </div>
       </section>
+
+      {/* Google Reviews — async, falls back to null if API unavailable */}
+      <ReviewsSection />
     </>
   )
 }
@@ -107,6 +111,78 @@ function TeaserCard({
         {cta}
         <span aria-hidden>→</span>
       </Link>
+    </div>
+  )
+}
+
+async function ReviewsSection() {
+  const [t, data] = await Promise.all([
+    getTranslations('reviews'),
+    getGoogleReviews(),
+  ])
+
+  if (!data || data.reviews.length === 0) return null
+
+  return (
+    <section className="bg-kob-black py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {/* Section header */}
+        <div className="mb-10 flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-kob-red">
+              Google
+            </p>
+            <h2 className="font-display text-3xl font-bold text-kob-white">
+              {t('heading')}
+            </h2>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border border-kob-border bg-kob-dark px-5 py-3">
+            <span className="text-4xl font-bold text-kob-white">
+              {data.rating.toFixed(1)}
+            </span>
+            <div>
+              <Stars rating={data.rating} />
+              <p className="mt-0.5 text-xs text-kob-muted">
+                {data.user_ratings_total} {t('totalReviews')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Review cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {data.reviews.map((review, i) => (
+            <ReviewCard key={i} review={review} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Stars({ rating }: { rating: number }) {
+  const full  = Math.floor(rating)
+  const empty = 5 - full
+  return (
+    <span className="text-kob-red text-lg leading-none" aria-label={`${rating} / 5`}>
+      {'★'.repeat(full)}{'☆'.repeat(empty)}
+    </span>
+  )
+}
+
+function ReviewCard({ review }: { review: PlaceReview }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-kob-border bg-kob-dark p-5">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-kob-white">{review.author_name}</p>
+          <p className="text-xs text-kob-muted">{review.relative_time_description}</p>
+        </div>
+        <Stars rating={review.rating} />
+      </div>
+      {review.text && (
+        <p className="text-sm leading-relaxed text-kob-muted line-clamp-4">{review.text}</p>
+      )}
     </div>
   )
 }
