@@ -1,5 +1,3 @@
-import { cacheLife } from 'next/cache'
-
 export type PlaceReview = {
   author_name: string
   rating: number
@@ -16,9 +14,6 @@ export type PlaceReviews = {
 const PLACE_ID = 'ChIJ0SaBgEwxwUcRnlbIUVNWILo'
 
 export async function getGoogleReviews(): Promise<PlaceReviews | null> {
-  'use cache'
-  cacheLife('days')
-
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) {
     console.error('[KOB Reviews] GOOGLE_PLACES_API_KEY not set')
@@ -32,7 +27,7 @@ export async function getGoogleReviews(): Promise<PlaceReviews | null> {
     url.searchParams.set('language', 'nl')
     url.searchParams.set('key', apiKey)
 
-    const res = await fetch(url.toString())
+    const res = await fetch(url.toString(), { next: { revalidate: 86400 } })
     if (!res.ok) {
       console.error(`[KOB Reviews] HTTP error: ${res.status}`)
       return null
