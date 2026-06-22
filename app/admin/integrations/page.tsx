@@ -18,7 +18,7 @@ export default async function IntegrationsPage() {
 
   const { data: barbers } = await supabase
     .from('barbers')
-    .select('id, name, google_calendar_id')
+    .select('id, name, google_calendar_id, whatsapp_number')
     .order('is_owner', { ascending: false })
     .order('name')
 

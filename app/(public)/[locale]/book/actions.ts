@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createCalendarEvent } from '@/lib/google-calendar'
+import { sendWhatsApp, barberNotificationMessage } from '@/lib/twilio'
 
 export interface SlotResult {
   slots: string[]
@@ -136,15 +137,16 @@ export async function createAppointment(
   // Create Calendar event (best-effort — a failure here doesn't affect the confirmed booking)
   const admin = createAdminClient()
   const [{ data: barber }, { data: service }] = await Promise.all([
-    admin.from('barbers').select('google_calendar_id').eq('id', input.barberId).single(),
+    admin.from('barbers').select('google_calendar_id, whatsapp_number').eq('id', input.barberId).single(),
     admin.from('services').select('name_en').eq('id', input.serviceId).single(),
   ])
 
+  const serviceName = service?.name_en ?? 'Afspraak'
+
   if (barber?.google_calendar_id) {
-    const summary = `${service?.name_en ?? 'Afspraak'} — ${input.customerName.trim()}`
     const calEventId = await createCalendarEvent({
       calendarId: barber.google_calendar_id,
-      summary,
+      summary:    `${serviceName} — ${input.customerName.trim()}`,
       appointmentId,
       startTime,
       endTime,
@@ -155,6 +157,18 @@ export async function createAppointment(
         .update({ google_calendar_event_id: calEventId })
         .eq('id', appointmentId)
     }
+  }
+
+  // WhatsApp notification to barber (best-effort — never blocks the confirmed booking)
+  if (barber?.whatsapp_number) {
+    const message = barberNotificationMessage({
+      customerName:  input.customerName.trim(),
+      serviceName,
+      date:          input.date,
+      time:          input.time,
+      customerPhone: input.customerPhone.trim(),
+    })
+    await sendWhatsApp(barber.whatsapp_number, message)
   }
 
   return {}

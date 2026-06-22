@@ -19,6 +19,8 @@ export interface Barber {
   is_owner: boolean
   // ID of the Google Calendar linked to this barber (set by developer in /admin/integrations).
   google_calendar_id: string | null
+  // WhatsApp number for barber notifications (international format, e.g. +32476000000).
+  whatsapp_number: string | null
   created_at: string
 }
 
@@ -45,6 +47,7 @@ export interface Appointment {
   status: AppointmentStatus
   source: AppointmentSource
   google_calendar_event_id: string | null
+  reminder_sent: boolean
   created_at: string
 }
 
