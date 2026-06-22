@@ -79,8 +79,8 @@ export async function GET(request: Request) {
       hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Brussels',
     })
 
-    const barber  = appt.barbers as { name: string } | null
-    const service = appt.services as { name_en: string } | null
+    const barber  = Array.isArray(appt.barbers)  ? appt.barbers[0]  : appt.barbers  as { name: string } | null
+    const service = Array.isArray(appt.services) ? appt.services[0] : appt.services as { name_en: string } | null
 
     const message = customerReminderMessage({
       customerName: appt.customer_name,
