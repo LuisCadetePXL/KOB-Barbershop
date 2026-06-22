@@ -121,7 +121,11 @@
     "done": {
       "heading": "Afspraak bevestigd!",
       "body": "We zien je graag. Bel ons als je moet annuleren.",
-      "backHome": "Terug naar home"
+      "backHome": "Terug naar home",
+      "summaryService": "Service",
+      "summaryBarber": "Barber",
+      "summaryDate": "Datum",
+      "summaryTime": "Tijdstip"
     }
   },
   "footer": {

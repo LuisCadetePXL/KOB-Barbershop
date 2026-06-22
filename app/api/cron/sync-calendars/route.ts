@@ -23,6 +23,12 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { listCalendarEvents, KOB_SOURCE_MARKER } from '@/lib/google-calendar'
 
+// All times are stored as real UTC throughout the system:
+//   - Website bookings (book/actions.ts): converts Europe/Brussels local → real UTC before INSERT
+//   - External Calendar events (this file): Google sends real UTC → stored as-is
+//   - get_available_slots (migration 0009): generates slots via AT TIME ZONE 'Europe/Brussels'
+// Do NOT convert Calendar times before storing — they are already correct UTC.
+
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
@@ -98,7 +104,7 @@ export async function GET(request: Request) {
           },
           {
             onConflict:       'google_calendar_event_id',
-            ignoreDuplicates: true,
+            ignoreDuplicates: false, // update existing rows so already-imported events with wrong times get corrected
           },
         )
 

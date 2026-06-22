@@ -454,8 +454,25 @@ function ConfirmStep({
 
 // ─── Step 6: Done ─────────────────────────────────────────────────────────────
 
-function DoneStep() {
+function DoneStep({ sel, locale }: { sel: Selection; locale: string }) {
   const t = useTranslations('book')
+
+  const dateLabel = sel.date
+    ? new Intl.DateTimeFormat(locale, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Europe/Brussels',
+      }).format(new Date(sel.date + 'T12:00:00Z'))
+    : ''
+
+  const rows = [
+    { label: t('done.summaryService'), value: sel.service?.name_en },
+    { label: t('done.summaryBarber'),  value: sel.barber?.name },
+    { label: t('done.summaryDate'),    value: dateLabel },
+    { label: t('done.summaryTime'),    value: sel.time },
+  ]
 
   return (
     <div className="py-6 text-center">
@@ -465,7 +482,19 @@ function DoneStep() {
       <h2 className="font-display text-2xl font-bold text-kob-white mb-3">
         {t('done.heading')}
       </h2>
-      <p className="text-kob-muted mb-8 max-w-xs mx-auto">{t('done.body')}</p>
+      <p className="text-kob-muted mb-6 max-w-xs mx-auto">{t('done.body')}</p>
+
+      <dl className="mx-auto mb-8 max-w-xs rounded-lg border border-kob-border bg-kob-black/40 text-left divide-y divide-kob-border">
+        {rows.map(({ label, value }) =>
+          value ? (
+            <div key={label} className="flex justify-between gap-4 px-4 py-2.5">
+              <dt className="text-xs text-kob-muted">{label}</dt>
+              <dd className="text-sm text-kob-white text-right">{value}</dd>
+            </div>
+          ) : null
+        )}
+      </dl>
+
       <Link href="/" className={BTN_PRIMARY}>
         {t('done.backHome')}
       </Link>
@@ -618,7 +647,7 @@ export default function BookingClient({
             />
           )}
 
-          {step === 'done' && <DoneStep />}
+          {step === 'done' && <DoneStep sel={sel} locale={locale} />}
         </div>
       </section>
     </>

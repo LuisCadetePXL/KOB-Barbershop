@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { cancelAppointment } from './actions'
 import type { AppointmentRow } from './page'
 
@@ -14,7 +15,7 @@ const SELECT =
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString('nl-BE', {
+  return new Date(iso).toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'Europe/Brussels',
@@ -22,7 +23,7 @@ function formatTime(iso: string) {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('nl-BE', {
+  return new Date(iso).toLocaleDateString('en-GB', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -37,7 +38,7 @@ function SourceBadge({ source }: { source: 'website' | 'external' }) {
   if (source === 'external') {
     return (
       <span className="inline-block rounded-full border border-amber-700 bg-amber-900/20 px-2 py-0.5 text-[10px] uppercase tracking-widest text-amber-400">
-        Telefoon
+        Phone
       </span>
     )
   }
@@ -136,10 +137,17 @@ function AppointmentItem({ appt }: { appt: AppointmentRow }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function AppointmentsClient({ appointments }: { appointments: AppointmentRow[] }) {
+  const router = useRouter()
   const [filterBarber, setFilterBarber]   = useState('')
   const [filterDate,   setFilterDate]     = useState('')
   const [filterStatus, setFilterStatus]   = useState('')
   const [filterSource, setFilterSource]   = useState('')
+
+  // Poll for new bookings every 30 seconds
+  useEffect(() => {
+    const id = setInterval(() => router.refresh(), 30_000)
+    return () => clearInterval(id)
+  }, [router])
 
   // Unique barber names for the barber dropdown
   const barberOptions = useMemo(() => {
@@ -168,7 +176,7 @@ export default function AppointmentsClient({ appointments }: { appointments: App
       <div className="mb-6">
         <h1 className="text-2xl font-display font-bold text-kob-white">Appointments</h1>
         <p className="mt-1 text-sm text-kob-muted">
-          {filtered.length} van {appointments.length} afspraken — online + telefonisch.
+          {filtered.length} of {appointments.length} appointments — online + phone.
         </p>
       </div>
 
@@ -182,7 +190,7 @@ export default function AppointmentsClient({ appointments }: { appointments: App
             onChange={(e) => setFilterBarber(e.target.value)}
             className={SELECT}
           >
-            <option value="">Alle barbers</option>
+            <option value="">All barbers</option>
             {barberOptions.map((name) => (
               <option key={name} value={name}>{name}</option>
             ))}
@@ -191,7 +199,7 @@ export default function AppointmentsClient({ appointments }: { appointments: App
 
         {/* Date */}
         <div>
-          <label className="block text-xs text-kob-muted mb-1">Datum</label>
+          <label className="block text-xs text-kob-muted mb-1">Date</label>
           <input
             type="date"
             value={filterDate}
@@ -208,7 +216,7 @@ export default function AppointmentsClient({ appointments }: { appointments: App
             onChange={(e) => setFilterStatus(e.target.value)}
             className={SELECT}
           >
-            <option value="">Alle statussen</option>
+            <option value="">All statuses</option>
             <option value="confirmed">Confirmed</option>
             <option value="cancelled">Cancelled</option>
           </select>
@@ -216,15 +224,15 @@ export default function AppointmentsClient({ appointments }: { appointments: App
 
         {/* Source */}
         <div>
-          <label className="block text-xs text-kob-muted mb-1">Bron</label>
+          <label className="block text-xs text-kob-muted mb-1">Source</label>
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
             className={SELECT}
           >
-            <option value="">Alle bronnen</option>
+            <option value="">All sources</option>
             <option value="website">Online</option>
-            <option value="external">Telefoon</option>
+            <option value="external">Phone</option>
           </select>
         </div>
 
@@ -248,7 +256,7 @@ export default function AppointmentsClient({ appointments }: { appointments: App
       <div className="rounded-lg border border-kob-border bg-kob-dark overflow-hidden">
         {filtered.length === 0 && (
           <p className="p-6 text-kob-muted text-sm">
-            {hasFilters ? 'Geen afspraken gevonden voor deze filters.' : 'Nog geen afspraken.'}
+            {hasFilters ? 'No appointments found for these filters.' : 'No appointments yet.'}
           </p>
         )}
         {filtered.map((appt) => (

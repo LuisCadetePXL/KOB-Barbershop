@@ -121,7 +121,11 @@
     "done": {
       "heading": "Booking confirmed!",
       "body": "We look forward to seeing you. If you need to cancel, please give us a call.",
-      "backHome": "Back to home"
+      "backHome": "Back to home",
+      "summaryService": "Service",
+      "summaryBarber": "Barber",
+      "summaryDate": "Date",
+      "summaryTime": "Time"
     }
   },
   "footer": {

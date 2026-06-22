@@ -78,8 +78,8 @@ export interface CreateAppointmentResult {
  * Returns { error: 'slot_taken' } when the EXCLUDE constraint fires — the UI shows a
  * message and returns the user to the time-slot step with refreshed availability.
  *
- * Times are stored as UTC. This is a known simplification for a single-timezone shop;
- * proper Europe/Brussels timezone handling is a Phase 10 concern.
+ * Times are stored as real UTC (Europe/Brussels local time converted to UTC).
+ * get_available_slots uses AT TIME ZONE 'Europe/Brussels' to match the same convention.
  */
 export async function createAppointment(
   input: CreateAppointmentInput,

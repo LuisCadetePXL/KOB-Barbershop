@@ -121,7 +121,11 @@
     "done": {
       "heading": "¡Reserva confirmada!",
       "body": "Estaremos encantados de recibirte. Llámanos si necesitas cancelar.",
-      "backHome": "Volver al inicio"
+      "backHome": "Volver al inicio",
+      "summaryService": "Servicio",
+      "summaryBarber": "Barber",
+      "summaryDate": "Fecha",
+      "summaryTime": "Hora"
     }
   },
   "footer": {
