@@ -11,13 +11,13 @@
     "location": "Leopoldsburg · Bélgica",
     "heading1": "King of",
     "heading2": "Barber",
-    "subtitle": "Cortes premium, fades y arreglo de barba — trabajo artesanal de un equipo que cuida cada detalle.",
+    "subtitle": "Cortes premium, fades y arreglo de barba. Trabajo artesanal de un equipo que cuida cada detalle.",
     "ctaBook": "Reservar",
     "ctaStory": "Nuestra historia",
     "scroll": "Desplazar",
     "teaserTeam": {
       "title": "Nuestro equipo",
-      "body": "Un pequeño equipo de barberos con experiencia — cada uno con su propio estilo y especialidad.",
+      "body": "Un pequeño equipo de barberos con experiencia, cada uno con su propio estilo y especialidad.",
       "cta": "Conoce al equipo"
     },
     "teaserPrices": {
@@ -27,7 +27,7 @@
     },
     "teaserContact": {
       "title": "Encuéntranos",
-      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Abierto seis días a la semana — se aceptan clientes sin cita.",
+      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Abierto seis días a la semana, se aceptan clientes sin cita.",
       "cta": "Cómo llegar"
     }
   },
@@ -36,19 +36,21 @@
     "sectionLabel": "Nuestra historia",
     "heading": "Más que un corte de pelo. Una experiencia.",
     "photoPlaceholder": "Foto próximamente",
-    "text": "King of Barber nació de una convicción sencilla: todo hombre merece un gran corte de pelo. Ubicados en el corazón de Leopoldsburg, hemos creado un espacio donde la precisión se une a la relajación — donde el oficio tradicional de la barbería se combina con una visión moderna y sofisticada. Nuestro equipo de hábiles barberos se enorgullece de cada detalle, desde la primera consulta hasta el acabado final. Ya sea que busques un corte clásico, un fade limpio o una barba que llame la atención, saldrás de King of Barber luciendo y sintiéndote en tu mejor momento. Los clientes sin cita siempre son bienvenidos."
+    "text": "K.O.B. Barbershop nació de una convicción sencilla: todo hombre merece un gran corte de pelo. Ubicados en el corazón de Leopoldsburg, hemos creado un espacio donde la precisión se une a la relajación. El oficio tradicional de la barbería se combina aquí con una visión moderna y sofisticada. Nuestro equipo de hábiles barberos se enorgullece de cada detalle, desde la primera consulta hasta el acabado final. Ya sea que busques un corte clásico, un fade limpio o una barba que llame la atención, saldrás de nuestra barbería luciendo y sintiéndote en tu mejor momento. Los clientes sin cita siempre son bienvenidos."
   },
   "team": {
     "pageTitle": "Nuestro equipo",
-    "intro": "Un equipo unido de hábiles barberos — cada uno aportando su propia técnica y personalidad.",
+    "intro": "Un equipo unido de hábiles barberos, cada uno aportando su propia técnica y personalidad.",
     "role": "Barbero",
+    "bookCta": "Reservar cita",
     "empty": "Información del equipo próximamente."
   },
   "prices": {
     "pageTitle": "Servicios y precios",
-    "intro": "Todos los precios incluyen acabado con toalla caliente. Se aceptan clientes sin cita — se recomienda reservar los fines de semana.",
+    "intro": "",
     "minutes": "min",
-    "disclaimer": "Los precios son valores provisionales — precios definitivos próximamente.",
+    "bookCta": "Reservar",
+    "disclaimer": "",
     "empty": "Precios próximamente."
   },
   "contact": {
@@ -57,8 +59,9 @@
     "contactInfo": "Contacto",
     "location": "Ubicación",
     "closed": "Cerrado",
-    "hoursDisclaimer": "* El horario es provisional — horario definitivo próximamente.",
-    "mapPlaceholder": "Mapa de Google — Place ID pendiente de confirmación.",
+    "hoursDisclaimer": "",
+    "mapLink": "Cómo llegar en Google Maps",
+    "mapPlaceholder": "Google Maps",
     "address": "Dirección",
     "phone": "Teléfono",
     "instagram": "Instagram",
@@ -103,7 +106,7 @@
       "namePlaceholder": "Nombre completo",
       "phoneLabel": "Número de teléfono",
       "phonePlaceholder": "+32 476 00 00 00",
-      "phoneHint": "Formato internacional recomendado — necesario para recordatorios de citas.",
+      "phoneHint": "Formato internacional recomendado, necesario para recordatorios de citas.",
       "phoneError": "Introduce un número de teléfono válido (p. ej. +32 476 00 00 00 o 0476 00 00 00)."
     },
     "confirm": {
@@ -119,18 +122,43 @@
       "slotTaken": "Alguien acaba de reservar este horario. Por favor, elige otro."
     },
     "done": {
-      "heading": "¡Reserva confirmada!",
-      "body": "Estaremos encantados de recibirte. Llámanos si necesitas cancelar.",
+      "heading": "Reserva confirmada!",
+      "body": "Estaremos encantados de recibirte. Recibirás una confirmación por WhatsApp.",
       "backHome": "Volver al inicio",
       "summaryService": "Servicio",
-      "summaryBarber": "Barber",
+      "summaryBarber": "Barbero",
       "summaryDate": "Fecha",
-      "summaryTime": "Hora"
+      "summaryTime": "Hora",
+      "cancelLinkHeading": "Cancelar cita",
+      "cancelLinkHint": "Guarda este enlace para cancelar tu cita. La cancelación es gratuita hasta 1,5 horas antes.",
+      "cancelLinkLabel": "Abrir enlace de cancelación",
+      "cancelDisclaimer": "La cancelación dentro de 1,5 horas antes de la cita conlleva un cargo de la mitad del precio del servicio. Tu nombre y número de teléfono quedan registrados."
     }
+  },
+  "cancel": {
+    "pageTitle": "Cancelar cita",
+    "details": "Tu cita",
+    "service": "Servicio",
+    "barber": "Barbero",
+    "date": "Fecha",
+    "time": "Hora",
+    "cancelBtn": "Cancelar cita",
+    "cancelBtnLate": "Cancelar de todas formas",
+    "cancelling": "Cancelando…",
+    "cancelled": "Cita cancelada",
+    "cancelledBody": "Tu cita ha sido cancelada. Esperamos verte pronto.",
+    "alreadyCancelled": "Esta cita ya ha sido cancelada.",
+    "alreadyPast": "Esta cita ya ha tenido lugar y no se puede cancelar.",
+    "invalidToken": "Este enlace de cancelación no es válido o no se encontró.",
+    "onTimeInfo": "La cancelación aún es posible. Haz clic en el botón para confirmar.",
+    "lateWarningHeading": "Cancelación tardía",
+    "lateWarning": "Tu cita es en menos de 1,5 horas. Cancelar implica un cargo de la mitad del precio del servicio (€{amount}). Tu nombre y número de teléfono quedarán registrados.",
+    "confirmPrompt": "¿Estás seguro de que quieres cancelar?"
   },
   "reviews": {
     "heading": "Lo que dicen los clientes",
-    "totalReviews": "reseñas"
+    "totalReviews": "reseñas",
+    "allReviews": "Todas las reseñas en Google"
   },
   "footer": {
     "tagline": "Barbería premium en Leopoldsburg.",

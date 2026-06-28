@@ -4,27 +4,24 @@ import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createCalendarEvent } from '@/lib/google-calendar'
-import { sendWhatsApp, barberNotificationMessage } from '@/lib/twilio'
+import {
+  sendWhatsApp,
+  barberNotificationMessage,
+  customerConfirmationMessage,
+} from '@/lib/twilio'
 
 export interface SlotResult {
   slots: string[]
   closed: boolean
 }
 
-/**
- * Returns available 15-minute slot start times (HH:MM) for a barber on a date.
- * Uses a security-definer Postgres function so anon users can check availability
- * without being able to read appointment customer data directly.
- */
 export async function getAvailableSlots(
   barberId: string,
-  date: string,           // YYYY-MM-DD
+  date: string,
   durationMinutes: number,
 ): Promise<SlotResult> {
   const supabase = await createClient()
 
-  // Check if the shop/barber is explicitly closed on this date before calling
-  // the heavier RPC, so we can return a meaningful `closed` flag to the UI.
   const { data: closedRows } = await supabase
     .from('closed_dates')
     .select('id')
@@ -36,8 +33,7 @@ export async function getAvailableSlots(
     return { slots: [], closed: true }
   }
 
-  // Also check regular weekly opening hours
-  const dayOfWeek = new Date(date + 'T12:00:00Z').getDay() // noon UTC avoids DST edge
+  const dayOfWeek = new Date(date + 'T12:00:00Z').getDay()
   const { data: hours } = await supabase
     .from('opening_hours')
     .select('closed')
@@ -48,7 +44,6 @@ export async function getAvailableSlots(
     return { slots: [], closed: true }
   }
 
-  // Fetch available slots via security-definer function (reads appointments internally)
   const { data: slots, error } = await supabase.rpc('get_available_slots', {
     p_barber_id: barberId,
     p_date: date,
@@ -63,8 +58,8 @@ export async function getAvailableSlots(
 export interface CreateAppointmentInput {
   barberId: string
   serviceId: string
-  date: string   // YYYY-MM-DD
-  time: string   // HH:MM
+  date: string
+  time: string
   durationMinutes: number
   customerName: string
   customerPhone: string
@@ -72,22 +67,14 @@ export interface CreateAppointmentInput {
 
 export interface CreateAppointmentResult {
   error?: string
+  cancelToken?: string
 }
 
-/**
- * Inserts a confirmed appointment. Anon users are allowed by RLS (public INSERT policy).
- * Returns { error: 'slot_taken' } when the EXCLUDE constraint fires — the UI shows a
- * message and returns the user to the time-slot step with refreshed availability.
- *
- * Times are stored as real UTC (Europe/Brussels local time converted to UTC).
- * get_available_slots uses AT TIME ZONE 'Europe/Brussels' to match the same convention.
- */
 export async function createAppointment(
   input: CreateAppointmentInput,
 ): Promise<CreateAppointmentResult> {
   const supabase = await createClient()
 
-  // Server-side validation (mirrors client-side checks; client can be bypassed)
   if (!input.customerName.trim()) return { error: 'Name is required.' }
   const strippedPhone = input.customerPhone.replace(/[\s\-\.\(\)]/g, '')
   if (!/^\+?[0-9]{9,15}$/.test(strippedPhone)) {
@@ -95,53 +82,48 @@ export async function createAppointment(
   }
 
   const appointmentId = randomUUID()
-  // Convert Europe/Brussels wall-clock time to UTC (handles DST automatically).
-  // Step 1: treat the chosen time as UTC naively to get a reference instant.
-  // Step 2: ask Intl what Brussels shows at that instant (sv-SE gives "YYYY-MM-DD HH:MM:SS").
-  // Step 3: parse that string explicitly as UTC (append Z) → brussels offset in ms.
-  // Step 4: subtract the offset to get the real UTC instant.
-  // e.g. 12:00 Brussels (UTC+2): naiveUtc=12:00Z, Brussels shows 14:00, offset=+2h → result=10:00Z ✓
-  // Parsing via sv-SE+Z avoids the new Date(localeString) local-timezone trap.
+  const cancelToken   = randomUUID()
+
   const naiveUtc = new Date(`${input.date}T${input.time}:00Z`)
   const brusselsString = new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'Europe/Brussels',
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', second: '2-digit',
     hour12: false,
-  }).format(naiveUtc) // → "2026-06-21 14:00:00"
+  }).format(naiveUtc)
   const brusselsAsUtc = new Date(brusselsString.replace(' ', 'T') + 'Z')
   const offsetMs = brusselsAsUtc.getTime() - naiveUtc.getTime()
   const startTime = new Date(naiveUtc.getTime() - offsetMs)
-  const endTime = new Date(startTime.getTime() + input.durationMinutes * 60_000)
+  const endTime   = new Date(startTime.getTime() + input.durationMinutes * 60_000)
 
   const { error } = await supabase
     .from('appointments')
     .insert({
-      id: appointmentId,
-      barber_id: input.barberId,
-      service_id: input.serviceId,
-      customer_name: input.customerName.trim(),
+      id:             appointmentId,
+      barber_id:      input.barberId,
+      service_id:     input.serviceId,
+      customer_name:  input.customerName.trim(),
       customer_phone: input.customerPhone.trim(),
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
-      status: 'confirmed',
-      source: 'website',
+      start_time:     startTime.toISOString(),
+      end_time:       endTime.toISOString(),
+      status:         'confirmed',
+      source:         'website',
+      cancel_token:   cancelToken,
     })
 
   if (error) {
-    // 23P01 = exclusion_violation — another booking just took this slot
     if (error.code === '23P01') return { error: 'slot_taken' }
     return { error: error.message }
   }
 
-  // Create Calendar event (best-effort — a failure here doesn't affect the confirmed booking)
   const admin = createAdminClient()
   const [{ data: barber }, { data: service }] = await Promise.all([
-    admin.from('barbers').select('google_calendar_id, whatsapp_number').eq('id', input.barberId).single(),
+    admin.from('barbers').select('name, google_calendar_id, whatsapp_number').eq('id', input.barberId).single(),
     admin.from('services').select('name_en').eq('id', input.serviceId).single(),
   ])
 
   const serviceName = service?.name_en ?? 'Afspraak'
+  const barberName  = barber?.name ?? 'Kapper'
 
   if (barber?.google_calendar_id) {
     const calEventId = await createCalendarEvent({
@@ -159,17 +141,44 @@ export async function createAppointment(
     }
   }
 
-  // WhatsApp notification to barber (best-effort — never blocks the confirmed booking)
+  // Check if this customer has outstanding late cancellation fees
+  const { data: outstandingFees } = await admin
+    .from('late_cancellation_fees')
+    .select('amount_owed')
+    .eq('customer_phone', input.customerPhone.trim())
+    .is('paid_at', null)
+
+  const totalOwed = outstandingFees?.reduce((sum, f) => sum + Number(f.amount_owed), 0) ?? 0
+
   if (barber?.whatsapp_number) {
-    const message = barberNotificationMessage({
+    let barberMsg = barberNotificationMessage({
       customerName:  input.customerName.trim(),
       serviceName,
       date:          input.date,
       time:          input.time,
       customerPhone: input.customerPhone.trim(),
     })
-    await sendWhatsApp(barber.whatsapp_number, message)
+    if (totalOwed > 0) {
+      barberMsg += `\n\n⚠️ Let op: deze klant heeft nog een openstaande schuld van €${totalOwed.toFixed(2)} van een eerdere te-late annulering.`
+    }
+    await sendWhatsApp(barber.whatsapp_number, barberMsg)
   }
 
-  return {}
+  // Send confirmation + cancel link to customer
+  const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://kobbarbershop.be'
+  const cancelUrl = `${siteUrl}/nl/cancel/${cancelToken}`
+
+  if (input.customerPhone.trim().startsWith('+')) {
+    const customerMsg = customerConfirmationMessage({
+      customerName: input.customerName.trim(),
+      serviceName,
+      barberName,
+      date:      input.date,
+      time:      input.time,
+      cancelUrl,
+    })
+    await sendWhatsApp(input.customerPhone.trim(), customerMsg)
+  }
+
+  return { cancelToken }
 }

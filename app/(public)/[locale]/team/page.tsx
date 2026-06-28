@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { Barber } from '@/types/database'
 
@@ -44,7 +45,12 @@ function TeamContent({ barbers }: { barbers: BarberRow[] | null }) {
             </p>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {barbers.map((barber) => (
-                <BarberCard key={barber.id} barber={barber} role={t('role')} />
+                <BarberCard
+                  key={barber.id}
+                  barber={barber}
+                  role={t('role')}
+                  bookCta={t('bookCta')}
+                />
               ))}
             </div>
           </>
@@ -56,7 +62,15 @@ function TeamContent({ barbers }: { barbers: BarberRow[] | null }) {
   )
 }
 
-function BarberCard({ barber, role }: { barber: BarberRow; role: string }) {
+function BarberCard({
+  barber,
+  role,
+  bookCta,
+}: {
+  barber: BarberRow
+  role: string
+  bookCta: string
+}) {
   return (
     <div className="group flex flex-col bg-kob-dark border border-kob-border overflow-hidden">
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-kob-surface">
@@ -72,9 +86,17 @@ function BarberCard({ barber, role }: { barber: BarberRow; role: string }) {
           <BarberInitials name={barber.name} />
         )}
       </div>
-      <div className="p-5 border-t border-kob-border">
-        <h2 className="font-display text-lg font-semibold text-kob-white">{barber.name}</h2>
-        <p className="mt-1 text-xs uppercase tracking-widest text-kob-red">{role}</p>
+      <div className="flex items-center justify-between gap-3 p-5 border-t border-kob-border">
+        <div>
+          <h2 className="font-display text-lg font-semibold text-kob-white">{barber.name}</h2>
+          <p className="mt-1 text-xs uppercase tracking-widest text-kob-red">{role}</p>
+        </div>
+        <Link
+          href={`/book?barber=${barber.id}` as '/book'}
+          className="shrink-0 bg-kob-red px-4 py-2 text-xs font-semibold uppercase tracking-widest text-kob-white transition-colors hover:bg-kob-red-dark"
+        >
+          {bookCta}
+        </Link>
       </div>
     </div>
   )

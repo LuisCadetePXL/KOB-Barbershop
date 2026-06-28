@@ -93,6 +93,11 @@ function AppointmentItem({ appt }: { appt: AppointmentRow }) {
           <span className="text-xs text-kob-muted">{timeLabel}</span>
           <StatusBadge status={appt.status} />
           <SourceBadge source={appt.source} />
+          {appt.hasDebt && (
+            <span className="inline-block rounded-full border border-amber-700 bg-amber-900/20 px-2 py-0.5 text-[10px] uppercase tracking-widest text-amber-400" title="Openstaande schuld van eerdere te-late annulering">
+              ⚠ Schuld
+            </span>
+          )}
         </div>
         <p className="text-sm text-kob-white">
           {appt.customer_name}

@@ -77,6 +77,76 @@ export function barberNotificationMessage(params: {
   ].join('\n')
 }
 
+export function customerConfirmationMessage(params: {
+  customerName: string
+  serviceName: string
+  barberName: string
+  date: string        // YYYY-MM-DD
+  time: string        // HH:MM Brussels local
+  cancelUrl: string
+}): string {
+  const dateFormatted = new Date(`${params.date}T12:00:00Z`).toLocaleDateString('nl-BE', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    timeZone: 'UTC',
+  })
+  return [
+    '✅ Afspraak bevestigd — K.O.B. Barbershop',
+    '',
+    `Hallo ${params.customerName}, je afspraak is bevestigd!`,
+    `✂️  ${params.serviceName} bij ${params.barberName}`,
+    `📅 ${dateFormatted} · ${params.time}`,
+    '📍 Maarschalk Fochstraat 5, Leopoldsburg',
+    '',
+    'Annuleren kan tot 1,5 uur voor aanvang via:',
+    params.cancelUrl,
+    '',
+    'Bij te late annulering is de helft van de prijs verschuldigd.',
+  ].join('\n')
+}
+
+export function barberCancellationMessage(params: {
+  customerName: string
+  serviceName: string
+  date: string
+  time: string
+}): string {
+  const dateFormatted = new Date(`${params.date}T12:00:00Z`).toLocaleDateString('nl-BE', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    timeZone: 'UTC',
+  })
+  return [
+    '🚫 Annulering — KOB',
+    '',
+    `${params.customerName} heeft zijn afspraak geannuleerd.`,
+    `✂️  ${params.serviceName}`,
+    `📅 ${dateFormatted} · ${params.time}`,
+  ].join('\n')
+}
+
+export function barberLateCancellationMessage(params: {
+  customerName: string
+  serviceName: string
+  date: string
+  time: string
+  customerPhone: string
+  amountOwed: number
+}): string {
+  const dateFormatted = new Date(`${params.date}T12:00:00Z`).toLocaleDateString('nl-BE', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    timeZone: 'UTC',
+  })
+  return [
+    '⚠️ Te late annulering — KOB',
+    '',
+    `${params.customerName} heeft te laat geannuleerd.`,
+    `✂️  ${params.serviceName}`,
+    `📅 ${dateFormatted} · ${params.time}`,
+    `📞 ${params.customerPhone}`,
+    `💶 Verschuldigd: €${params.amountOwed.toFixed(2)}`,
+    'Naam en nummer zijn opgeslagen.',
+  ].join('\n')
+}
+
 export function customerReminderMessage(params: {
   customerName: string
   serviceName: string

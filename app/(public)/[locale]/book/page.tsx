@@ -3,7 +3,10 @@ import { createClient } from '@/lib/supabase/server'
 import BookingClient from './BookingClient'
 import type { Barber, Service } from '@/types/database'
 
-type Props = { params: Promise<{ locale: string }> }
+type Props = {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ service?: string; barber?: string }>
+}
 
 export async function generateMetadata({ params }: Props) {
   const { locale } = await params
@@ -14,8 +17,11 @@ export async function generateMetadata({ params }: Props) {
 type BookingService = Pick<Service, 'id' | 'name_en' | 'description_en' | 'price' | 'duration_minutes'>
 type BookingBarber  = Pick<Barber,  'id' | 'name' | 'photo_url' | 'is_owner'>
 
-export default async function BookPage({ params }: Props) {
-  const { locale } = await params
+export default async function BookPage({ params, searchParams }: Props) {
+  const [{ locale }, { service: serviceId, barber: barberId }] = await Promise.all([
+    params,
+    searchParams,
+  ])
   setRequestLocale(locale)
 
   const supabase = await createClient()
@@ -35,12 +41,20 @@ export default async function BookPage({ params }: Props) {
 
   const today = new Date().toISOString().split('T')[0]
 
+  const allServices = (services ?? []) as BookingService[]
+  const allBarbers  = (barbers  ?? []) as BookingBarber[]
+
+  const initialService = serviceId ? allServices.find((s) => s.id === serviceId) ?? null : null
+  const initialBarber  = barberId  ? allBarbers.find((b)  => b.id === barberId)  ?? null : null
+
   return (
     <BookingClient
-      services={(services ?? []) as BookingService[]}
-      barbers={(barbers ?? []) as BookingBarber[]}
+      services={allServices}
+      barbers={allBarbers}
       locale={locale}
       today={today}
+      initialService={initialService}
+      initialBarber={initialBarber}
     />
   )
 }

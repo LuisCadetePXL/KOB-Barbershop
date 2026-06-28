@@ -11,23 +11,23 @@
     "location": "Leopoldsburg · Belgium",
     "heading1": "King of",
     "heading2": "Barber",
-    "subtitle": "Premium cuts, fades and beard work — crafted by a team that takes pride in every detail.",
+    "subtitle": "Premium cuts, fades and beard work. Crafted by a team that takes pride in every detail.",
     "ctaBook": "Book Now",
     "ctaStory": "Our Story",
     "scroll": "Scroll",
     "teaserTeam": {
       "title": "Our Team",
-      "body": "A small crew of experienced barbers — each with their own style and specialty.",
+      "body": "A small crew of experienced barbers, each with their own style and specialty.",
       "cta": "Meet the barbers"
     },
     "teaserPrices": {
-      "title": "Services & Prices",
+      "title": "Services and Prices",
       "body": "Classic cuts, fades, beard trims and combo deals. Transparent pricing, no surprises.",
       "cta": "View prices"
     },
     "teaserContact": {
       "title": "Find Us",
-      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Open six days a week — walk-ins welcome.",
+      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Open six days a week, walk-ins welcome.",
       "cta": "Get directions"
     }
   },
@@ -36,19 +36,21 @@
     "sectionLabel": "Our Story",
     "heading": "More than a haircut. An experience.",
     "photoPlaceholder": "Photo coming soon",
-    "text": "King of Barber was born out of a simple conviction: every man deserves a great cut. Based in the heart of Leopoldsburg, we've built a space where precision meets relaxation — where traditional barbering craft is paired with a sharp modern eye. Our team of skilled barbers takes pride in every detail, from the first consultation to the final finish. Whether you're after a classic cut, a clean fade or a beard that turns heads, you'll leave King of Barber looking and feeling your best. Walk-ins are always welcome."
+    "text": "K.O.B. Barbershop was born out of a simple conviction: every man deserves a great cut. Based in the heart of Leopoldsburg, we have built a space where precision meets relaxation. Traditional barbering craft is paired here with a sharp modern eye. Our team of skilled barbers takes pride in every detail, from the first consultation to the final finish. Whether you are after a classic cut, a clean fade or a beard that turns heads, you will leave us looking and feeling your best. Walk-ins are always welcome."
   },
   "team": {
     "pageTitle": "Our Team",
-    "intro": "A tight-knit crew of skilled barbers — each bringing their own technique and personality to the chair.",
+    "intro": "A tight-knit crew of skilled barbers, each bringing their own technique and personality to the chair.",
     "role": "Barber",
+    "bookCta": "Book appointment",
     "empty": "Team info coming soon."
   },
   "prices": {
-    "pageTitle": "Services & Prices",
-    "intro": "All prices include a hot towel finish. Walk-ins welcome — appointments recommended on weekends.",
+    "pageTitle": "Services and Prices",
+    "intro": "",
     "minutes": "min",
-    "disclaimer": "Prices are placeholder values — confirmed pricing coming soon.",
+    "bookCta": "Book",
+    "disclaimer": "",
     "empty": "Prices coming soon."
   },
   "contact": {
@@ -57,8 +59,9 @@
     "contactInfo": "Contact",
     "location": "Location",
     "closed": "Closed",
-    "hoursDisclaimer": "* Hours are placeholder — confirmed hours coming soon.",
-    "mapPlaceholder": "Google Maps embed — Place ID to be confirmed.",
+    "hoursDisclaimer": "",
+    "mapLink": "Get directions in Google Maps",
+    "mapPlaceholder": "Google Maps",
     "address": "Address",
     "phone": "Phone",
     "instagram": "Instagram",
@@ -79,7 +82,7 @@
     "steps": {
       "service": "Service",
       "barber": "Barber",
-      "datetime": "Date & Time",
+      "datetime": "Date and Time",
       "contact": "Details",
       "confirm": "Confirm"
     },
@@ -91,7 +94,7 @@
       "heading": "Choose a barber"
     },
     "datetime": {
-      "heading": "Choose a date & time",
+      "heading": "Choose a date and time",
       "dateLabel": "Select a date",
       "noSlots": "No available slots on this date.",
       "closedDay": "The shop is closed on this date.",
@@ -103,7 +106,7 @@
       "namePlaceholder": "Full name",
       "phoneLabel": "Phone number",
       "phonePlaceholder": "+32 476 00 00 00",
-      "phoneHint": "International format recommended — needed for appointment reminders.",
+      "phoneHint": "International format recommended, needed for appointment reminders.",
       "phoneError": "Please enter a valid phone number (e.g. +32 476 00 00 00 or 0476 00 00 00)."
     },
     "confirm": {
@@ -120,17 +123,42 @@
     },
     "done": {
       "heading": "Booking confirmed!",
-      "body": "We look forward to seeing you. If you need to cancel, please give us a call.",
+      "body": "We look forward to seeing you. You will receive a confirmation via WhatsApp.",
       "backHome": "Back to home",
       "summaryService": "Service",
       "summaryBarber": "Barber",
       "summaryDate": "Date",
-      "summaryTime": "Time"
+      "summaryTime": "Time",
+      "cancelLinkHeading": "Cancel appointment",
+      "cancelLinkHint": "Save this link to cancel your appointment. Cancellation is free up to 1.5 hours before your appointment.",
+      "cancelLinkLabel": "Open cancellation link",
+      "cancelDisclaimer": "Cancellation within 1.5 hours of your appointment will result in a charge of half the service price. Your name and phone number are stored."
     }
+  },
+  "cancel": {
+    "pageTitle": "Cancel appointment",
+    "details": "Your appointment",
+    "service": "Service",
+    "barber": "Barber",
+    "date": "Date",
+    "time": "Time",
+    "cancelBtn": "Cancel appointment",
+    "cancelBtnLate": "Cancel anyway",
+    "cancelling": "Cancelling…",
+    "cancelled": "Appointment cancelled",
+    "cancelledBody": "Your appointment has been cancelled. We hope to see you soon.",
+    "alreadyCancelled": "This appointment has already been cancelled.",
+    "alreadyPast": "This appointment has already taken place and cannot be cancelled.",
+    "invalidToken": "This cancellation link is invalid or not found.",
+    "onTimeInfo": "Cancellation is still possible. Click the button below to confirm.",
+    "lateWarningHeading": "Late cancellation",
+    "lateWarning": "Your appointment is less than 1.5 hours away. Cancelling will incur a charge of half the service price (€{amount}). Your name and phone number will be stored.",
+    "confirmPrompt": "Are you sure you want to cancel?"
   },
   "reviews": {
     "heading": "What customers say",
-    "totalReviews": "reviews"
+    "totalReviews": "reviews",
+    "allReviews": "All reviews on Google"
   },
   "footer": {
     "tagline": "Premium barbershop in Leopoldsburg.",

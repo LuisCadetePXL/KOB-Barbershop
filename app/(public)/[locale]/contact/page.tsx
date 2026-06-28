@@ -90,7 +90,6 @@ function ContactContent({
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-xs text-kob-muted">{t('hoursDisclaimer')}</p>
           </div>
 
           {/* Contact info + map */}
@@ -130,11 +129,25 @@ function ContactContent({
 
             <div>
               <SectionLabel>{t('location')}</SectionLabel>
-              <div className="mt-6 aspect-video w-full bg-kob-surface border border-kob-border flex items-center justify-center">
-                <p className="text-xs text-kob-muted text-center px-4">
-                  {t('mapPlaceholder')}
-                </p>
+              {/* Dark map via CSS invert — no API key needed for the basic embed */}
+              <div className="mt-6 overflow-hidden border border-kob-border">
+                <iframe
+                  src="https://maps.google.com/maps?q=Maarschalk+Fochstraat+5,+3970+Leopoldsburg,+Belgium&output=embed&hl=nl&z=16"
+                  className="w-full aspect-video block"
+                  style={{ opacity: 0.95 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="KOB Barbershop locatie"
+                />
               </div>
+              <a
+                href="https://maps.google.com/?q=Maarschalk+Fochstraat+5,+3970+Leopoldsburg,+Belgium"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-kob-red hover:text-kob-white transition-colors"
+              >
+                {t('mapLink')} →
+              </a>
             </div>
           </div>
         </div>

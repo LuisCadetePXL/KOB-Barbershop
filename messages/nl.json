@@ -11,23 +11,23 @@
     "location": "Leopoldsburg · België",
     "heading1": "King of",
     "heading2": "Barber",
-    "subtitle": "Premium knippen, fades en baardzorg — vakwerk van een team dat oog heeft voor elk detail.",
+    "subtitle": "Premium knippen, fades en baardzorg. Vakwerk van een team dat oog heeft voor elk detail.",
     "ctaBook": "Boek nu",
     "ctaStory": "Ons verhaal",
     "scroll": "Scroll",
     "teaserTeam": {
       "title": "Ons team",
-      "body": "Een klein team van ervaren kappers — elk met hun eigen stijl en specialiteit.",
+      "body": "Een klein team van ervaren kappers, elk met hun eigen stijl en specialiteit.",
       "cta": "Ontmoet het team"
     },
     "teaserPrices": {
-      "title": "Diensten & prijzen",
+      "title": "Diensten en prijzen",
       "body": "Klassieke knippen, fades, baardtrims en combopakketten. Transparante prijzen, geen verrassingen.",
       "cta": "Bekijk prijzen"
     },
     "teaserContact": {
       "title": "Vind ons",
-      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Zes dagen per week open — inlopen welkom.",
+      "body": "Maarschalk Fochstraat 5, Leopoldsburg. Zes dagen per week open, inlopen welkom.",
       "cta": "Routebeschrijving"
     }
   },
@@ -36,19 +36,21 @@
     "sectionLabel": "Ons verhaal",
     "heading": "Meer dan een knipbeurt. Een ervaring.",
     "photoPlaceholder": "Foto volgt binnenkort",
-    "text": "King of Barber is ontstaan vanuit een eenvoudige overtuiging: elke man verdient een geweldige knipbeurt. Gevestigd in het hart van Leopoldsburg, hebben we een plek gebouwd waar precisie en ontspanning samenkomen — waar het traditionele kappersvak wordt gecombineerd met een scherp modern oog. Ons team van vaardige kappers is trots op elk detail, van het eerste gesprek tot de laatste afwerking. Of je nu zoekt naar een klassieke knipbeurt, een strakke fade of een baard die opvalt, je verlaat King of Barber er op je best uitziend en zo voelend. Inlopen altijd welkom."
+    "text": "K.O.B. Barbershop is ontstaan vanuit een eenvoudige overtuiging: elke man verdient een geweldige knipbeurt. Gevestigd in het hart van Leopoldsburg, hebben we een plek gebouwd waar precisie en ontspanning samenkomen. Het traditionele kappersvak wordt hier gecombineerd met een scherp modern oog. Ons team van vaardige kappers is trots op elk detail, van het eerste gesprek tot de laatste afwerking. Of je nu zoekt naar een klassieke knipbeurt, een strakke fade of een baard die opvalt, je verlaat ons er op je best uitziend en voelend. Inlopen altijd welkom."
   },
   "team": {
     "pageTitle": "Ons team",
-    "intro": "Een hecht team van vaardige kappers — elk met hun eigen techniek en persoonlijkheid.",
+    "intro": "Een hecht team van vaardige kappers, elk met hun eigen techniek en persoonlijkheid.",
     "role": "Kapper",
+    "bookCta": "Afspraak maken",
     "empty": "Teaminformatie volgt binnenkort."
   },
   "prices": {
-    "pageTitle": "Diensten & prijzen",
-    "intro": "Alle prijzen zijn inclusief een warm handdoekfinish. Inlopen welkom — afspraak aanbevolen in het weekend.",
+    "pageTitle": "Diensten en prijzen",
+    "intro": "",
     "minutes": "min",
-    "disclaimer": "Prijzen zijn voorlopige waarden — definitieve prijzen volgen binnenkort.",
+    "bookCta": "Boek",
+    "disclaimer": "",
     "empty": "Prijzen volgen binnenkort."
   },
   "contact": {
@@ -57,8 +59,9 @@
     "contactInfo": "Contact",
     "location": "Locatie",
     "closed": "Gesloten",
-    "hoursDisclaimer": "* Uren zijn voorlopig — definitieve openingsuren volgen binnenkort.",
-    "mapPlaceholder": "Google Maps embed — Place ID nog te bevestigen.",
+    "hoursDisclaimer": "",
+    "mapLink": "Routebeschrijving in Google Maps",
+    "mapPlaceholder": "Google Maps",
     "address": "Adres",
     "phone": "Telefoon",
     "instagram": "Instagram",
@@ -79,7 +82,7 @@
     "steps": {
       "service": "Dienst",
       "barber": "Kapper",
-      "datetime": "Datum & tijd",
+      "datetime": "Datum en tijd",
       "contact": "Gegevens",
       "confirm": "Bevestigen"
     },
@@ -91,7 +94,7 @@
       "heading": "Kies een kapper"
     },
     "datetime": {
-      "heading": "Kies datum & tijd",
+      "heading": "Kies datum en tijd",
       "dateLabel": "Kies een datum",
       "noSlots": "Geen beschikbare tijdsloten op deze datum.",
       "closedDay": "De zaak is gesloten op deze datum.",
@@ -103,7 +106,7 @@
       "namePlaceholder": "Volledige naam",
       "phoneLabel": "Telefoonnummer",
       "phonePlaceholder": "+32 476 00 00 00",
-      "phoneHint": "Internationaal formaat aanbevolen — nodig voor afspraakherinneringen.",
+      "phoneHint": "Internationaal formaat aanbevolen, nodig voor afspraakherinneringen.",
       "phoneError": "Voer een geldig telefoonnummer in (bijv. +32 476 00 00 00 of 0476 00 00 00)."
     },
     "confirm": {
@@ -120,17 +123,42 @@
     },
     "done": {
       "heading": "Afspraak bevestigd!",
-      "body": "We zien je graag. Bel ons als je moet annuleren.",
+      "body": "We zien je graag. Je ontvangt een bevestiging via WhatsApp.",
       "backHome": "Terug naar home",
-      "summaryService": "Service",
-      "summaryBarber": "Barber",
+      "summaryService": "Dienst",
+      "summaryBarber": "Kapper",
       "summaryDate": "Datum",
-      "summaryTime": "Tijdstip"
+      "summaryTime": "Tijdstip",
+      "cancelLinkHeading": "Afspraak annuleren",
+      "cancelLinkHint": "Bewaar deze link om je afspraak te annuleren. Annuleren kan gratis tot 1,5 uur voor aanvang.",
+      "cancelLinkLabel": "Annulatielink openen",
+      "cancelDisclaimer": "Bij annulering binnen 1,5 uur voor aanvang is de helft van de prijs verschuldigd. Uw naam en telefoonnummer zijn opgeslagen."
     }
+  },
+  "cancel": {
+    "pageTitle": "Afspraak annuleren",
+    "details": "Jouw afspraak",
+    "service": "Dienst",
+    "barber": "Kapper",
+    "date": "Datum",
+    "time": "Tijdstip",
+    "cancelBtn": "Afspraak annuleren",
+    "cancelBtnLate": "Toch annuleren",
+    "cancelling": "Bezig met annuleren…",
+    "cancelled": "Afspraak geannuleerd",
+    "cancelledBody": "Je afspraak is geannuleerd. We hopen je snel te zien.",
+    "alreadyCancelled": "Deze afspraak is al geannuleerd.",
+    "alreadyPast": "Deze afspraak heeft al plaatsgevonden en kan niet meer geannuleerd worden.",
+    "invalidToken": "Deze annulatielink is ongeldig of niet gevonden.",
+    "onTimeInfo": "Annulering is nog mogelijk. Klik op de knop om te bevestigen.",
+    "lateWarningHeading": "Te late annulering",
+    "lateWarning": "Het is minder dan 1,5 uur voor je afspraak. Bij annulering is de helft van de prijs (€{amount}) verschuldigd. Uw naam en telefoonnummer worden bewaard.",
+    "confirmPrompt": "Weet je zeker dat je wil annuleren?"
   },
   "reviews": {
     "heading": "Wat klanten zeggen",
-    "totalReviews": "beoordelingen"
+    "totalReviews": "beoordelingen",
+    "allReviews": "Alle reviews op Google"
   },
   "footer": {
     "tagline": "Premium barbershop in Leopoldsburg.",

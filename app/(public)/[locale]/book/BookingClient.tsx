@@ -373,7 +373,7 @@ function ConfirmStep({
   selection: Selection
   locale: string
   onBack: () => void
-  onConfirmed: () => void
+  onConfirmed: (cancelToken: string | null) => void
   onSlotTaken: () => void
 }) {
   const t = useTranslations('book')
@@ -414,7 +414,7 @@ function ConfirmStep({
       } else if (result.error) {
         setError(result.error)
       } else {
-        onConfirmed()
+        onConfirmed(result.cancelToken ?? null)
       }
     })
   }
@@ -454,7 +454,15 @@ function ConfirmStep({
 
 // ─── Step 6: Done ─────────────────────────────────────────────────────────────
 
-function DoneStep({ sel, locale }: { sel: Selection; locale: string }) {
+function DoneStep({
+  sel,
+  locale,
+  cancelToken,
+}: {
+  sel: Selection
+  locale: string
+  cancelToken: string | null
+}) {
   const t = useTranslations('book')
 
   const dateLabel = sel.date
@@ -473,6 +481,9 @@ function DoneStep({ sel, locale }: { sel: Selection; locale: string }) {
     { label: t('done.summaryDate'),    value: dateLabel },
     { label: t('done.summaryTime'),    value: sel.time },
   ]
+
+  const siteUrl   = typeof window !== 'undefined' ? window.location.origin : ''
+  const cancelUrl = cancelToken ? `${siteUrl}/${locale}/cancel/${cancelToken}` : null
 
   return (
     <div className="py-6 text-center">
@@ -495,6 +506,24 @@ function DoneStep({ sel, locale }: { sel: Selection; locale: string }) {
         )}
       </dl>
 
+      {cancelUrl && (
+        <div className="mx-auto mb-6 max-w-sm rounded-lg border border-kob-border bg-kob-surface px-5 py-4 text-left">
+          <p className="text-xs font-semibold uppercase tracking-widest text-kob-red mb-2">
+            {t('done.cancelLinkHeading')}
+          </p>
+          <p className="text-xs text-kob-muted mb-3">{t('done.cancelLinkHint')}</p>
+          <a
+            href={cancelUrl}
+            className="block truncate text-xs text-kob-white underline underline-offset-2 hover:text-kob-red transition-colors mb-3"
+          >
+            {t('done.cancelLinkLabel')} →
+          </a>
+          <p className="text-xs text-kob-muted/70 leading-relaxed">
+            {t('done.cancelDisclaimer')}
+          </p>
+        </div>
+      )}
+
       <Link href="/" className={BTN_PRIMARY}>
         {t('done.backHome')}
       </Link>
@@ -511,37 +540,56 @@ export default function BookingClient({
   barbers,
   locale,
   today,
+  initialService = null,
+  initialBarber  = null,
 }: {
   services: BookingService[]
   barbers:  BookingBarber[]
   locale:   string
   today:    string
+  initialService?: BookingService | null
+  initialBarber?:  BookingBarber  | null
 }) {
   const t = useTranslations('book')
 
-  const [step, setStep] = useState<Step>('service')
+  // When deep-linked from team/prices we skip the already-known step.
+  // skipBarber: came from team page — barber is pre-selected, skip barber step.
+  // skipService: came from prices page — service is pre-selected, skip service step.
+  const skipBarber  = !!initialBarber  && !initialService
+  const skipService = !!initialService && !initialBarber
+
+  const [cancelToken, setCancelToken] = useState<string | null>(null)
+
+  const [step, setStep] = useState<Step>(
+    initialBarber  && !initialService ? 'service' :   // team page: pick service first
+    initialService && !initialBarber  ? 'barber'  :   // prices page: pick barber next
+    'service'
+  )
   const [slotTakenError, setSlotTakenError] = useState(false)
   const [sel, setSel] = useState<Selection>({
-    service: null, barber: null, date: '', time: '', name: '', phone: '',
+    service: initialService,
+    barber:  initialBarber,
+    date: '', time: '', name: '', phone: '',
   })
   // Tracks whether the restore-from-sessionStorage effect has run.
-  // The persist effect is gated on this so it doesn't overwrite saved state
-  // with the empty initial state on first render.
   const [restored, setRestored] = useState(false)
 
-  // Restore wizard state from sessionStorage on mount (survives tab switches).
+  // Restore wizard state from sessionStorage — but only when there is no deep-link.
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        const { step: s, sel: savedSel } = JSON.parse(raw) as { step: Step; sel: Selection }
-        if (s && s !== 'done') setStep(s)
-        if (savedSel) setSel(savedSel)
+    if (!initialService && !initialBarber) {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY)
+        if (raw) {
+          const { step: s, sel: savedSel } = JSON.parse(raw) as { step: Step; sel: Selection }
+          if (s && s !== 'done') setStep(s)
+          if (savedSel) setSel(savedSel)
+        }
+      } catch {
+        // sessionStorage unavailable or corrupt — start fresh
       }
-    } catch {
-      // sessionStorage unavailable or corrupt — start fresh
     }
     setRestored(true)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Persist wizard state on every change (after restore is complete).
@@ -583,9 +631,9 @@ export default function BookingClient({
             <ServiceStep
               services={services}
               onSelect={(service) => {
-                // Changing service resets all downstream selections
-                setSel({ service, barber: null, date: '', time: '', name: sel.name, phone: sel.phone })
-                setStep('barber')
+                setSel((prev) => ({ ...prev, service, barber: skipBarber ? prev.barber : null, date: '', time: '' }))
+                // If barber was pre-selected (from team page), skip barber step
+                setStep(skipBarber ? 'datetime' : 'barber')
               }}
             />
           )}
@@ -594,7 +642,6 @@ export default function BookingClient({
             <BarberStep
               barbers={barbers}
               onSelect={(barber) => {
-                // Changing barber resets date + time (availability differs per barber)
                 setSel((prev) => ({ ...prev, barber, date: '', time: '' }))
                 setSlotTakenError(false)
                 setStep('datetime')
@@ -617,7 +664,8 @@ export default function BookingClient({
               }}
               onBack={() => {
                 setSlotTakenError(false)
-                setStep('barber')
+                // When barber was pre-selected we skip back to service, not barber
+                setStep(skipBarber ? 'service' : 'barber')
               }}
             />
           )}
@@ -642,12 +690,12 @@ export default function BookingClient({
               selection={sel}
               locale={locale}
               onBack={() => setStep('contact')}
-              onConfirmed={() => setStep('done')}
+              onConfirmed={(token) => { setCancelToken(token); setStep('done') }}
               onSlotTaken={handleSlotTaken}
             />
           )}
 
-          {step === 'done' && <DoneStep sel={sel} locale={locale} />}
+          {step === 'done' && <DoneStep sel={sel} locale={locale} cancelToken={cancelToken} />}
         </div>
       </section>
     </>

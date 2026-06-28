@@ -1,6 +1,7 @@
 export type TranslationStatus = 'pending' | 'complete' | 'failed'
 export type AppointmentStatus = 'confirmed' | 'cancelled'
 export type AppointmentSource = 'website' | 'external'
+export type CancellationType = 'on_time' | 'late'
 export type UserRole = 'admin' | 'developer'
 
 export interface Profile {
@@ -48,6 +49,20 @@ export interface Appointment {
   source: AppointmentSource
   google_calendar_event_id: string | null
   reminder_sent: boolean
+  cancel_token: string | null
+  cancelled_at: string | null
+  cancellation_type: CancellationType | null
+  created_at: string
+}
+
+export interface LateCancellationFee {
+  id: string
+  appointment_id: string
+  customer_name: string
+  customer_phone: string
+  amount_owed: number
+  paid_at: string | null
+  marked_paid_by: string | null
   created_at: string
 }
 

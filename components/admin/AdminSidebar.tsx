@@ -13,7 +13,9 @@ const NAV_ITEMS = [
   { href: '/admin/barbers',      label: 'Barbers',        icon: '✂' },
   { href: '/admin/services',     label: 'Services',       icon: '€' },
   { href: '/admin/opening-hours',label: 'Opening Hours',  icon: '🕐' },
-  { href: '/admin/closed-dates', label: 'Closed Dates',   icon: '🚫' },
+  { href: '/admin/closed-dates',        label: 'Closed Dates',  icon: '🚫' },
+  { href: '/admin/cancellation-fees',   label: 'Late Cancels',  icon: '💶' },
+  { href: '/admin/settings',            label: 'Settings',      icon: '⚙️' },
 ] as const
 
 const DEV_ITEMS = [
