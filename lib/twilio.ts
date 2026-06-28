@@ -16,9 +16,14 @@ export async function sendWhatsApp(to: string, body: string): Promise<boolean> {
   const from       = process.env.TWILIO_WHATSAPP_FROM
 
   if (!accountSid || !authToken || !from) {
-    console.error('[KOB WhatsApp] Skipped: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN or TWILIO_WHATSAPP_FROM not set')
+    console.error('[KOB WhatsApp] Skipped — missing env vars:', {
+      hasSid:   !!accountSid,
+      hasToken: !!authToken,
+      hasFrom:  !!from,
+    })
     return false
   }
+  console.log(`[KOB WhatsApp] Sending to ${to} from ${from}`)
 
   const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
   const credentials = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
@@ -45,8 +50,12 @@ export async function sendWhatsApp(to: string, body: string): Promise<boolean> {
       return false
     }
 
-    const data = await res.json() as { sid?: string }
-    console.log(`[KOB WhatsApp] Sent to ${to}, SID: ${data.sid}`)
+    const data = await res.json() as { sid?: string; status?: string; error_message?: string }
+    if (data.error_message) {
+      console.error(`[KOB WhatsApp] Twilio error: ${data.error_message}`)
+      return false
+    }
+    console.log(`[KOB WhatsApp] Sent to ${to} ✓ SID: ${data.sid} status: ${data.status}`)
     return true
   } catch (err) {
     console.error('[KOB WhatsApp] Send error:', err)

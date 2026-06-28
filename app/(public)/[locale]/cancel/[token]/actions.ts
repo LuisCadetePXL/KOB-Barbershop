@@ -1,6 +1,7 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
+import { deleteCalendarEvent } from '@/lib/google-calendar'
 import { sendWhatsApp, barberCancellationMessage, barberLateCancellationMessage } from '@/lib/twilio'
 
 const LATE_THRESHOLD_MS = 90 * 60 * 1000 // 1.5 hours
@@ -17,7 +18,8 @@ export async function cancelAppointment(token: string): Promise<CancelResult> {
     .select(`
       id, status, start_time, cancel_token, cancelled_at,
       customer_name, customer_phone,
-      barbers ( name, whatsapp_number ),
+      google_calendar_event_id,
+      barbers ( name, whatsapp_number, google_calendar_id ),
       services ( name_en, price )
     `)
     .eq('cancel_token', token)
@@ -47,8 +49,13 @@ export async function cancelAppointment(token: string): Promise<CancelResult> {
 
   if (updateError) return { status: 'error', message: updateError.message }
 
-  const barber  = Array.isArray(appt.barbers)  ? appt.barbers[0]  : appt.barbers  as { name: string; whatsapp_number: string | null } | null
+  const barber  = Array.isArray(appt.barbers)  ? appt.barbers[0]  : appt.barbers  as { name: string; whatsapp_number: string | null; google_calendar_id: string | null } | null
   const service = Array.isArray(appt.services) ? appt.services[0] : appt.services as { name_en: string; price: number } | null
+
+  // Delete Google Calendar event (best-effort)
+  if (appt.google_calendar_event_id && barber?.google_calendar_id) {
+    await deleteCalendarEvent(barber.google_calendar_id, appt.google_calendar_event_id)
+  }
 
   const serviceName = service?.name_en ?? 'Afspraak'
   const servicePrice = Number(service?.price ?? 0)
@@ -71,6 +78,7 @@ export async function cancelAppointment(token: string): Promise<CancelResult> {
     })
   }
 
+  console.log(`[KOB Cancel] barber.whatsapp_number = ${barber?.whatsapp_number ?? 'NOT SET'}, isLate = ${isLate}`)
   if (barber?.whatsapp_number) {
     const msg = isLate
       ? barberLateCancellationMessage({

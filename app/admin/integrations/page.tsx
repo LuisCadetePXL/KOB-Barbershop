@@ -14,7 +14,7 @@ export default async function IntegrationsPage() {
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'developer') redirect('/admin')
+  const isDeveloper = profile?.role === 'developer'
 
   const { data: barbers } = await supabase
     .from('barbers')
@@ -22,5 +22,5 @@ export default async function IntegrationsPage() {
     .order('is_owner', { ascending: false })
     .order('name')
 
-  return <IntegrationsClient barbers={barbers ?? []} />
+  return <IntegrationsClient barbers={barbers ?? []} isDeveloper={isDeveloper} />
 }

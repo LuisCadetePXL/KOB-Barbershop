@@ -150,6 +150,7 @@ export async function createAppointment(
 
   const totalOwed = outstandingFees?.reduce((sum, f) => sum + Number(f.amount_owed), 0) ?? 0
 
+  console.log(`[KOB Book] barber.whatsapp_number = ${barber?.whatsapp_number ?? 'NOT SET'}`)
   if (barber?.whatsapp_number) {
     let barberMsg = barberNotificationMessage({
       customerName:  input.customerName.trim(),
@@ -165,6 +166,7 @@ export async function createAppointment(
   }
 
   // Send confirmation + cancel link to customer
+  console.log(`[KOB Book] customer phone = ${input.customerPhone.trim()}, starts with '+': ${input.customerPhone.trim().startsWith('+')}`)
   const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://kobbarbershop.be'
   const cancelUrl = `${siteUrl}/nl/cancel/${cancelToken}`
 
