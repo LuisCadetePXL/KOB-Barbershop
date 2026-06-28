@@ -142,11 +142,13 @@ export async function createAppointment(
   }
 
   // Check if this customer has outstanding late cancellation fees
-  const { data: outstandingFees } = await admin
+  console.log('[KOB Book] reached fees query')
+  const { data: outstandingFees, error: feesError } = await admin
     .from('late_cancellation_fees')
     .select('amount_owed')
     .eq('customer_phone', input.customerPhone.trim())
     .is('paid_at', null)
+  console.log(`[KOB Book] fees query done — error: ${feesError?.message ?? 'none'}, rows: ${outstandingFees?.length ?? 'null'}`)
 
   const totalOwed = outstandingFees?.reduce((sum, f) => sum + Number(f.amount_owed), 0) ?? 0
 
