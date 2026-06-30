@@ -14,13 +14,12 @@ const NAV_ITEMS = [
   { href: '/admin/services',     label: 'Services',       icon: '€' },
   { href: '/admin/opening-hours',label: 'Opening Hours',  icon: '🕐' },
   { href: '/admin/closed-dates',        label: 'Closed Dates',  icon: '🚫' },
+  { href: '/admin/breaks',               label: 'Breaks',        icon: '⏸' },
   { href: '/admin/cancellation-fees',   label: 'Late Cancels',  icon: '💶' },
   { href: '/admin/settings',            label: 'Settings',      icon: '⚙️' },
+  { href: '/admin/integrations',        label: 'Integrations',  icon: '⚙' },
 ] as const
 
-const DEV_ITEMS = [
-  { href: '/admin/integrations', label: 'Integrations',   icon: '⚙' },
-] as const
 
 export default function AdminSidebar({
   role,
@@ -71,28 +70,6 @@ export default function AdminSidebar({
           )
         })}
 
-        {role === 'developer' && (
-          <>
-            <div className="my-3 border-t border-kob-border" />
-            <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-widest text-kob-border">
-              Developer
-            </p>
-            {DEV_ITEMS.map(({ href, label, icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-3 rounded px-3 py-2 text-sm transition-colors ${
-                  pathname.startsWith(href)
-                    ? 'bg-kob-surface text-kob-white'
-                    : 'text-kob-muted hover:bg-kob-surface hover:text-kob-white'
-                }`}
-              >
-                <span className="w-4 text-center text-xs" aria-hidden>{icon}</span>
-                {label}
-              </Link>
-            ))}
-          </>
-        )}
       </nav>
 
       {/* User + logout */}

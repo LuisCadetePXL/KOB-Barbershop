@@ -142,18 +142,14 @@ export async function createAppointment(
   }
 
   // Check if this customer has outstanding late cancellation fees
-  console.log('[KOB Book] reached fees query')
-  const { data: outstandingFees, error: feesError } = await admin
+  const { data: outstandingFees } = await admin
     .from('late_cancellation_fees')
     .select('amount_owed')
     .eq('customer_phone', input.customerPhone.trim())
     .is('paid_at', null)
-  console.log(`[KOB Book] fees query done — error: ${feesError?.message ?? 'none'}, rows: ${outstandingFees?.length ?? 'null'}`)
 
   const totalOwed = outstandingFees?.reduce((sum, f) => sum + Number(f.amount_owed), 0) ?? 0
 
-  // ── Barber WhatsApp ────────────────────────────────────────────────────────
-  console.log(`[KOB Book] barber loaded: ${barber ? 'yes' : 'NO — null'}, whatsapp_number = ${barber?.whatsapp_number ?? 'NOT SET'}`)
   if (barber?.whatsapp_number) {
     let barberMsg = barberNotificationMessage({
       customerName:  input.customerName.trim(),
@@ -165,18 +161,12 @@ export async function createAppointment(
     if (totalOwed > 0) {
       barberMsg += `\n\n⚠️ Let op: deze klant heeft nog een openstaande schuld van €${totalOwed.toFixed(2)} van een eerdere te-late annulering.`
     }
-    console.log(`[KOB Book] calling sendWhatsApp for barber → ${barber.whatsapp_number}`)
-    const barberOk = await sendWhatsApp(barber.whatsapp_number, barberMsg)
-    console.log(`[KOB Book] barber sendWhatsApp result: ${barberOk}`)
-  } else {
-    console.log('[KOB Book] skipping barber WhatsApp — no whatsapp_number')
+    await sendWhatsApp(barber.whatsapp_number, barberMsg)
   }
 
-  // ── Customer confirmation ──────────────────────────────────────────────────
   const customerPhone = input.customerPhone.trim()
   const siteUrl       = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://kobbarbershop.be'
   const cancelUrl     = `${siteUrl}/nl/cancel/${cancelToken}`
-  console.log(`[KOB Book] customer phone = ${customerPhone}, starts with '+': ${customerPhone.startsWith('+')}`)
 
   if (customerPhone.startsWith('+')) {
     let customerMsg = customerConfirmationMessage({
@@ -190,11 +180,7 @@ export async function createAppointment(
     if (totalOwed > 0) {
       customerMsg += `\n\n⚠️ Opgelet: je hebt nog een openstaande schuld van €${totalOwed.toFixed(2)} van een eerdere te late annulering. Gelieve dit bedrag mee te brengen en te betalen bij aanvang van je afspraak.`
     }
-    console.log(`[KOB Book] calling sendWhatsApp for customer → ${customerPhone}`)
-    const customerOk = await sendWhatsApp(customerPhone, customerMsg)
-    console.log(`[KOB Book] customer sendWhatsApp result: ${customerOk}`)
-  } else {
-    console.log('[KOB Book] skipping customer WhatsApp — phone does not start with +')
+    await sendWhatsApp(customerPhone, customerMsg)
   }
 
   return { cancelToken }
