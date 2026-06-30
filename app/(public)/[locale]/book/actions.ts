@@ -179,7 +179,7 @@ export async function createAppointment(
   console.log(`[KOB Book] customer phone = ${customerPhone}, starts with '+': ${customerPhone.startsWith('+')}`)
 
   if (customerPhone.startsWith('+')) {
-    const customerMsg = customerConfirmationMessage({
+    let customerMsg = customerConfirmationMessage({
       customerName: input.customerName.trim(),
       serviceName,
       barberName,
@@ -187,6 +187,9 @@ export async function createAppointment(
       time:      input.time,
       cancelUrl,
     })
+    if (totalOwed > 0) {
+      customerMsg += `\n\n⚠️ Opgelet: je hebt nog een openstaande schuld van €${totalOwed.toFixed(2)} van een eerdere te late annulering. Gelieve dit bedrag mee te brengen en te betalen bij aanvang van je afspraak.`
+    }
     console.log(`[KOB Book] calling sendWhatsApp for customer → ${customerPhone}`)
     const customerOk = await sendWhatsApp(customerPhone, customerMsg)
     console.log(`[KOB Book] customer sendWhatsApp result: ${customerOk}`)
