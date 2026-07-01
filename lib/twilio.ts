@@ -5,6 +5,12 @@
 //   TWILIO_AUTH_TOKEN    — from Twilio Console dashboard
 //   TWILIO_WHATSAPP_FROM — e.g. whatsapp:+14155238886 (sandbox) or whatsapp:+32... (production)
 
+// Mask a phone number for logging — keeps only the last 4 digits so logs never
+// contain full customer/barber numbers (PII). e.g. +32476001234 → •••••••1234
+function maskPhone(phone: string): string {
+  return phone.replace(/.(?=.{4})/g, '•')
+}
+
 /**
  * Sends a WhatsApp message via Twilio.
  * `to` must be in international format, e.g. +32476000000 (without whatsapp: prefix).
@@ -23,7 +29,7 @@ export async function sendWhatsApp(to: string, body: string): Promise<boolean> {
     })
     return false
   }
-  console.log(`[KOB WhatsApp] Sending to ${to} from ${from}`)
+  console.log(`[KOB WhatsApp] Sending to ${maskPhone(to)}`)
 
   const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
   const credentials = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
@@ -55,7 +61,7 @@ export async function sendWhatsApp(to: string, body: string): Promise<boolean> {
       console.error(`[KOB WhatsApp] Twilio error: ${data.error_message}`)
       return false
     }
-    console.log(`[KOB WhatsApp] Sent to ${to} ✓ SID: ${data.sid} status: ${data.status}`)
+    console.log(`[KOB WhatsApp] Sent to ${maskPhone(to)} ✓ SID: ${data.sid} status: ${data.status}`)
     return true
   } catch (err) {
     console.error('[KOB WhatsApp] Send error:', err)

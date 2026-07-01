@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import AppointmentsClient from './AppointmentsClient'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { UserRole } from '@/types/database'
 
 export type AppointmentRow = {
   id: string
-  status: 'confirmed' | 'cancelled'
+  status: 'confirmed' | 'cancelled' | 'archived'
   source: 'website' | 'external' | 'recurring'
   start_time: string
   end_time: string
@@ -23,6 +24,12 @@ export type ServiceOption = { id: string; name_en: string; duration_minutes: num
 export default async function AppointmentsPage() {
   const supabase = await createClient()
   const admin    = createAdminClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: profile }  = user
+    ? await supabase.from('profiles').select('role').eq('id', user.id).single()
+    : { data: null }
+  const isDeveloper = (profile?.role as UserRole | undefined) === 'developer'
 
   const [
     { data: appointments },
@@ -61,6 +68,7 @@ export default async function AppointmentsPage() {
       appointments={enriched as unknown as AppointmentRow[]}
       barbers={(barbers ?? []) as BarberOption[]}
       services={(services ?? []) as ServiceOption[]}
+      isDeveloper={isDeveloper}
     />
   )
 }

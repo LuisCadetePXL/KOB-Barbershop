@@ -78,7 +78,6 @@ export async function cancelAppointment(token: string): Promise<CancelResult> {
     })
   }
 
-  console.log(`[KOB Cancel] barber.whatsapp_number = ${barber?.whatsapp_number ?? 'NOT SET'}, isLate = ${isLate}`)
   if (barber?.whatsapp_number) {
     const msg = isLate
       ? barberLateCancellationMessage({

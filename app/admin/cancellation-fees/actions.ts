@@ -1,13 +1,11 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { requireStaff } from '@/lib/auth'
 
 export async function markFeePaid(feeId: string): Promise<{ error: string | null }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Unauthorized' }
+  const user = await requireStaff()
 
   const admin = createAdminClient()
   const { error } = await admin

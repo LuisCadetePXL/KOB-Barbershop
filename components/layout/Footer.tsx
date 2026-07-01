@@ -1,10 +1,21 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { createClient } from '@/lib/supabase/server'
 
-export default function Footer() {
+export default async function Footer() {
   const t  = useTranslations('nav')
   const tf = useTranslations('footer')
   const year = new Date().getFullYear()
+
+  const supabase = await createClient()
+  const { data: settings } = await supabase
+    .from('business_settings')
+    .select('instagram_url, facebook_url, tiktok_url')
+    .single()
+
+  const instagramUrl = settings?.instagram_url || null
+  const facebookUrl  = settings?.facebook_url  || null
+  const tiktokUrl    = settings?.tiktok_url    || null
 
   const navLinks = [
     { href: '/' as const,        label: t('home') },
@@ -27,15 +38,21 @@ export default function Footer() {
             <p className="mt-2 text-sm text-kob-muted">{tf('tagline')}</p>
 
             <div className="mt-5 flex items-center gap-4">
-              <SocialLink href="https://www.instagram.com/king_of_barber_belgium" label="Instagram">
-                <InstagramIcon />
-              </SocialLink>
-              <SocialLink href="#" label="Facebook">
-                <FacebookIcon />
-              </SocialLink>
-              <SocialLink href="#" label="TikTok">
-                <TikTokIcon />
-              </SocialLink>
+              {instagramUrl && (
+                <SocialLink href={instagramUrl} label="Instagram">
+                  <InstagramIcon />
+                </SocialLink>
+              )}
+              {facebookUrl && (
+                <SocialLink href={facebookUrl} label="Facebook">
+                  <FacebookIcon />
+                </SocialLink>
+              )}
+              {tiktokUrl && (
+                <SocialLink href={tiktokUrl} label="TikTok">
+                  <TikTokIcon />
+                </SocialLink>
+              )}
             </div>
           </div>
 
@@ -71,7 +88,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 border-t border-kob-border pt-6 text-xs text-kob-muted">
-          © {year} K.O.B. Barbershop. {tf('copyright')}
+          © {year} K.O.B. Belgium. {tf('copyright')}
         </div>
       </div>
     </footer>
@@ -82,8 +99,8 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
   return (
     <a
       href={href}
-      target={href === '#' ? undefined : '_blank'}
-      rel={href === '#' ? undefined : 'noopener noreferrer'}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={label}
       className="text-kob-muted hover:text-kob-white transition-colors"
     >
@@ -114,15 +131,6 @@ function TikTokIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.73a4.85 4.85 0 0 1-1.01-.04z" />
-    </svg>
-  )
-}
-
-function YouTubeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.97A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none" />
     </svg>
   )
 }

@@ -5,8 +5,11 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { deleteCalendarEvent } from '@/lib/google-calendar'
 import { generateAppointmentsForClient, type PatternType } from '@/lib/recurring-appointments'
+import { requireStaff } from '@/lib/auth'
 
 export async function addRecurringClient(_: unknown, formData: FormData) {
+  await requireStaff()
+
   const supabase = await createClient()
   const admin    = createAdminClient()
 
@@ -50,14 +53,8 @@ export async function addRecurringClient(_: unknown, formData: FormData) {
 
   if (insertError) return { error: insertError.message }
 
-  console.log('[KOB Recurring] client inserted:', client?.id)
-  console.log('[KOB Recurring] client.service_id:', client?.service_id)
-  console.log('[KOB Recurring] client.services:', JSON.stringify(client?.services))
-  console.log('[KOB Recurring] client.barbers:', JSON.stringify(client?.barbers))
-
   // Generate appointments for the next 3 months immediately
-  const result = await generateAppointmentsForClient(client as any, admin)
-  console.log('[KOB Recurring] generate result:', JSON.stringify(result))
+  await generateAppointmentsForClient(client as any, admin)
 
   revalidatePath('/admin/recurring-clients')
   revalidatePath('/admin/appointments')
@@ -65,6 +62,8 @@ export async function addRecurringClient(_: unknown, formData: FormData) {
 }
 
 export async function deactivateRecurringClient(id: string): Promise<{ error?: string }> {
+  await requireStaff()
+
   const admin = createAdminClient()
 
   // Load the recurring client (need barber for calendar deletion)
@@ -109,5 +108,53 @@ export async function deactivateRecurringClient(id: string): Promise<{ error?: s
 
   revalidatePath('/admin/recurring-clients')
   revalidatePath('/admin/appointments')
+  return {}
+}
+
+export async function reactivateRecurringClient(id: string): Promise<{ error?: string }> {
+  await requireStaff()
+
+  const admin = createAdminClient()
+
+  const { error } = await admin
+    .from('recurring_clients')
+    .update({ active: true })
+    .eq('id', id)
+
+  if (error) return { error: error.message }
+
+  // Fetch full client data and generate appointments for the next 3 months
+  const { data: client } = await admin
+    .from('recurring_clients')
+    .select(`
+      id, barber_id, customer_name, customer_phone,
+      service_id, start_time, pattern_type, day_of_week, week_of_month,
+      barbers ( name, google_calendar_id, whatsapp_number ),
+      services ( name_en, duration_minutes )
+    `)
+    .eq('id', id)
+    .single()
+
+  if (client) await generateAppointmentsForClient(client as any, admin)
+
+  revalidatePath('/admin/recurring-clients')
+  revalidatePath('/admin/appointments')
+  return {}
+}
+
+export async function deleteRecurringClient(id: string): Promise<{ error?: string }> {
+  await requireStaff()
+
+  const admin = createAdminClient()
+
+  // recurring_client_id on appointments is ON DELETE SET NULL — past appointments are kept
+  const { error } = await admin
+    .from('recurring_clients')
+    .delete()
+    .eq('id', id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin/recurring-clients')
   return {}
 }

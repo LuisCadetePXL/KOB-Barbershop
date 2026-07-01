@@ -1,8 +1,9 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { addRecurringClient, deactivateRecurringClient } from './actions'
+import { addRecurringClient, deactivateRecurringClient, reactivateRecurringClient, deleteRecurringClient } from './actions'
 import type { PatternType } from '@/lib/recurring-appointments'
+import PhoneInput from '@/components/ui/PhoneInput'
 
 const INPUT  = 'w-full rounded border border-kob-border bg-kob-black px-3 py-2 text-sm text-kob-white placeholder:text-kob-muted focus:border-kob-red focus:outline-none'
 const SELECT = 'w-full rounded border border-kob-border bg-kob-black px-3 py-2 text-sm text-kob-white focus:border-kob-red focus:outline-none'
@@ -70,6 +71,7 @@ function AddForm({
   onClose: () => void
 }) {
   const [pattern, setPattern]       = useState<PatternType>('weekly')
+  const [phone,   setPhone]         = useState('+32')
   const [error,   setError]         = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -80,7 +82,7 @@ function AddForm({
     startTransition(async () => {
       const result = await addRecurringClient(null, new FormData(e.currentTarget))
       if (result.error) { setError(result.error) }
-      else { formRef.current?.reset(); onClose() }
+      else { formRef.current?.reset(); setPhone('+32'); onClose() }
     })
   }
 
@@ -122,7 +124,8 @@ function AddForm({
         {/* Phone */}
         <div>
           <label className={LABEL}>Phone</label>
-          <input name="customer_phone" placeholder="+32476000000" className={INPUT} />
+          <PhoneInput value={phone} onChange={setPhone} placeholder="476 00 00 00" />
+          <input type="hidden" name="customer_phone" value={phone} />
         </div>
 
         {/* Start time */}
@@ -200,14 +203,28 @@ function ClientRow({
   client: ClientRow
   futureCount: number
 }) {
-  const [confirm,   setConfirm]   = useState(false)
+  const [confirm,   setConfirm]   = useState<'deactivate' | 'delete' | null>(null)
   const [error,     setError]     = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   function handleDeactivate() {
     startTransition(async () => {
       const result = await deactivateRecurringClient(client.id)
-      if (result.error) { setError(result.error); setConfirm(false) }
+      if (result.error) { setError(result.error); setConfirm(null) }
+    })
+  }
+
+  function handleReactivate() {
+    startTransition(async () => {
+      const result = await reactivateRecurringClient(client.id)
+      if (result.error) setError(result.error)
+    })
+  }
+
+  function handleDelete() {
+    startTransition(async () => {
+      const result = await deleteRecurringClient(client.id)
+      if (result.error) { setError(result.error); setConfirm(null) }
     })
   }
 
@@ -238,25 +255,41 @@ function ClientRow({
         {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
       </div>
 
-      {client.active && (
-        <div className="flex items-center gap-2 shrink-0">
-          {confirm ? (
+      <div className="flex items-center gap-2 shrink-0">
+        {client.active ? (
+          confirm === 'deactivate' ? (
             <>
               <span className="text-xs text-amber-400">Cancel {futureCount} future appointments?</span>
-              <button
-                disabled={isPending}
-                onClick={handleDeactivate}
-                className="rounded bg-red-700 px-3 py-1.5 text-xs text-white hover:bg-red-800 disabled:opacity-50"
-              >
+              <button disabled={isPending} onClick={handleDeactivate}
+                className="rounded bg-red-700 px-3 py-1.5 text-xs text-white hover:bg-red-800 disabled:opacity-50">
                 {isPending ? '…' : 'Confirm'}
               </button>
-              <button onClick={() => setConfirm(false)} className={BTN_GHOST}>No</button>
+              <button onClick={() => setConfirm(null)} className={BTN_GHOST}>No</button>
             </>
           ) : (
-            <button onClick={() => setConfirm(true)} className={BTN_DANGER}>Deactivate</button>
-          )}
-        </div>
-      )}
+            <button onClick={() => setConfirm('deactivate')} className={BTN_DANGER}>Deactivate</button>
+          )
+        ) : (
+          confirm === 'delete' ? (
+            <>
+              <span className="text-xs text-red-400">Permanently delete?</span>
+              <button disabled={isPending} onClick={handleDelete}
+                className="rounded bg-red-700 px-3 py-1.5 text-xs text-white hover:bg-red-800 disabled:opacity-50">
+                {isPending ? '…' : 'Delete'}
+              </button>
+              <button onClick={() => setConfirm(null)} className={BTN_GHOST}>No</button>
+            </>
+          ) : (
+            <>
+              <button disabled={isPending} onClick={handleReactivate}
+                className="rounded border border-green-800 px-3 py-1.5 text-sm text-green-400 hover:bg-green-900/20 disabled:opacity-50">
+                {isPending ? '…' : 'Reactivate'}
+              </button>
+              <button onClick={() => setConfirm('delete')} className={BTN_DANGER}>Delete</button>
+            </>
+          )
+        )}
+      </div>
     </div>
   )
 }

@@ -87,6 +87,8 @@ export interface BusinessSettings {
   phone: string | null
   address: string | null
   instagram_url: string | null
+  facebook_url: string | null
+  tiktok_url: string | null
   google_maps_place_id: string | null
   updated_at: string
 }

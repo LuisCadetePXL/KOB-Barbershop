@@ -5,7 +5,7 @@ import { updateBusinessSettings } from './actions'
 import type { BusinessSettings } from '@/types/database'
 
 type Props = {
-  settings: Pick<BusinessSettings, 'phone' | 'address' | 'instagram_url'> | null
+  settings: Pick<BusinessSettings, 'phone' | 'address' | 'instagram_url' | 'facebook_url' | 'tiktok_url'> | null
 }
 
 export default function SettingsClient({ settings }: Props) {
@@ -62,6 +62,22 @@ export default function SettingsClient({ settings }: Props) {
           defaultValue={settings?.instagram_url ?? ''}
           placeholder="https://www.instagram.com/king_of_barber_belgium"
           hint="Full URL including https://"
+        />
+
+        <Field
+          label="Facebook URL"
+          name="facebook_url"
+          defaultValue={settings?.facebook_url ?? ''}
+          placeholder="https://www.facebook.com/..."
+          hint="Leave empty to hide the Facebook icon in the footer."
+        />
+
+        <Field
+          label="TikTok URL"
+          name="tiktok_url"
+          defaultValue={settings?.tiktok_url ?? ''}
+          placeholder="https://www.tiktok.com/@..."
+          hint="Leave empty to hide the TikTok icon in the footer."
         />
 
         <div className="flex items-center gap-4 pt-2">

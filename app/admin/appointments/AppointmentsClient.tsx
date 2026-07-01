@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { cancelAppointment, createAdminAppointment, checkOutstandingFees, getAdminAvailableSlots } from './actions'
+import { cancelAppointment, createAdminAppointment, checkOutstandingFees, getAdminAvailableSlots, archiveOldAppointments } from './actions'
 import type { AppointmentRow, BarberOption, ServiceOption } from './page'
+import PhoneInput, { isValidPhone } from '@/components/ui/PhoneInput'
 
 const BTN_PRIMARY =
   'rounded bg-kob-red px-4 py-2 text-sm font-medium text-white hover:bg-kob-red-dark disabled:opacity-50'
@@ -57,11 +58,18 @@ function SourceBadge({ source }: { source: 'website' | 'external' | 'recurring' 
   )
 }
 
-function StatusBadge({ status }: { status: 'confirmed' | 'cancelled' }) {
+function StatusBadge({ status }: { status: 'confirmed' | 'cancelled' | 'archived' }) {
   if (status === 'cancelled') {
     return (
       <span className="inline-block rounded-full border border-red-800 bg-red-900/20 px-2 py-0.5 text-[10px] uppercase tracking-widest text-red-400">
         Cancelled
+      </span>
+    )
+  }
+  if (status === 'archived') {
+    return (
+      <span className="inline-block rounded-full border border-kob-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-kob-muted">
+        Archived
       </span>
     )
   }
@@ -151,7 +159,7 @@ function NewAppointmentForm({
   const [date,      setDate]      = useState('')
   const [time,      setTime]      = useState('')
   const [name,      setName]      = useState('')
-  const [phone,     setPhone]     = useState('')
+  const [phone,     setPhone]     = useState('+32')
   const [note,      setNote]      = useState('')
 
   const [slots,     setSlots]     = useState<string[]>([])
@@ -301,11 +309,10 @@ function NewAppointmentForm({
         {/* Phone */}
         <div>
           <label className={LABEL}>Phone</label>
-          <input
+          <PhoneInput
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+32476000000"
-            className={INPUT}
+            onChange={setPhone}
+            placeholder="476 00 00 00"
           />
           {debtChecked && debtWarning && (
             <p className="mt-1 text-xs text-amber-400">{debtWarning}</p>
@@ -345,17 +352,22 @@ export default function AppointmentsClient({
   appointments,
   barbers,
   services,
+  isDeveloper = false,
 }: {
   appointments: AppointmentRow[]
   barbers: BarberOption[]
   services: ServiceOption[]
+  isDeveloper?: boolean
 }) {
   const router = useRouter()
-  const [showNew, setShowNew]             = useState(false)
-  const [filterBarber, setFilterBarber]   = useState('')
-  const [filterDate,   setFilterDate]     = useState('')
-  const [filterStatus, setFilterStatus]   = useState('')
-  const [filterSource, setFilterSource]   = useState('')
+  const [showNew, setShowNew]               = useState(false)
+  const [filterBarber, setFilterBarber]     = useState('')
+  const [filterDate,   setFilterDate]       = useState('')
+  const [filterStatus, setFilterStatus]     = useState('')
+  const [filterSource, setFilterSource]     = useState('')
+  const [showArchived, setShowArchived]     = useState(false)
+  const [archivePending, startArchive]      = useTransition()
+  const [archiveResult, setArchiveResult]   = useState<string | null>(null)
 
   useEffect(() => {
     const id = setInterval(() => router.refresh(), 30_000)
@@ -372,28 +384,46 @@ export default function AppointmentsClient({
 
   const filtered = useMemo(() => {
     return appointments.filter((a) => {
+      if (!showArchived && a.status === 'archived') return false
       if (filterBarber && a.barbers?.name !== filterBarber) return false
       if (filterDate && !a.start_time.startsWith(filterDate)) return false
       if (filterStatus && a.status !== filterStatus) return false
       if (filterSource && a.source !== filterSource) return false
       return true
     })
-  }, [appointments, filterBarber, filterDate, filterStatus, filterSource])
+  }, [appointments, filterBarber, filterDate, filterStatus, filterSource, showArchived])
 
   const hasFilters = filterBarber || filterDate || filterStatus || filterSource
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
         <h1 className="text-2xl font-display font-bold text-kob-white">Appointments</h1>
-        {!showNew && (
-          <button onClick={() => setShowNew(true)} className={BTN_PRIMARY}>
-            + New appointment
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isDeveloper && (
+            <button
+              onClick={() => startArchive(async () => {
+                const r = await archiveOldAppointments()
+                setArchiveResult(r.error ? `Error: ${r.error}` : `Archived ${r.archived} appointments.`)
+              })}
+              disabled={archivePending}
+              className="rounded border border-kob-border px-3 py-1.5 text-xs text-kob-muted hover:text-kob-white disabled:opacity-50"
+            >
+              {archivePending ? 'Archiving…' : 'Archive >6 months'}
+            </button>
+          )}
+          {!showNew && (
+            <button onClick={() => setShowNew(true)} className={BTN_PRIMARY}>
+              + New appointment
+            </button>
+          )}
+        </div>
       </div>
+      {archiveResult && (
+        <p className="mb-3 text-xs text-kob-muted">{archiveResult}</p>
+      )}
       <p className="mb-5 text-sm text-kob-muted">
-        {filtered.length} of {appointments.length} appointments — online + phone.
+        {filtered.length} of {appointments.filter((a) => showArchived || a.status !== 'archived').length} appointments — online + phone.
       </p>
 
       {showNew && (
@@ -423,6 +453,7 @@ export default function AppointmentsClient({
             <option value="">All statuses</option>
             <option value="confirmed">Confirmed</option>
             <option value="cancelled">Cancelled</option>
+            {showArchived && <option value="archived">Archived</option>}
           </select>
         </div>
         <div>
@@ -431,7 +462,23 @@ export default function AppointmentsClient({
             <option value="">All sources</option>
             <option value="website">Online</option>
             <option value="external">Phone</option>
+            <option value="recurring">Recurring</option>
           </select>
+        </div>
+        <div className="flex items-center gap-2 self-end pb-1.5">
+          <input
+            id="show-archived"
+            type="checkbox"
+            checked={showArchived}
+            onChange={(e) => {
+              setShowArchived(e.target.checked)
+              if (!e.target.checked && filterStatus === 'archived') setFilterStatus('')
+            }}
+            className="accent-kob-red"
+          />
+          <label htmlFor="show-archived" className="text-xs text-kob-muted cursor-pointer select-none">
+            Show archived
+          </label>
         </div>
         {hasFilters && (
           <button

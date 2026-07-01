@@ -39,6 +39,26 @@ async function handleAdmin(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
+  // Logged in — verify the account is actually staff (admin/developer).
+  // A valid Supabase session is not enough: without this check any registered
+  // user would pass the gate. RLS still protects RLS-based queries, but the
+  // service-role server actions rely on this + their own requireStaff() guard.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const isStaff = !!profile && ['admin', 'developer'].includes(profile.role)
+
+  if (!isStaff) {
+    // Non-staff: let them see the login page (so they can sign in as staff),
+    // but block every other /admin path. Returning `response` on the login page
+    // avoids a redirect loop with the isLoginPage → /admin redirect below.
+    if (isLoginPage) return response
+    return NextResponse.redirect(new URL('/admin/login', request.url))
+  }
+
   if (isLoginPage) {
     return NextResponse.redirect(new URL('/admin', request.url))
   }

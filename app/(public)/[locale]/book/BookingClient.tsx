@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { getAvailableSlots, createAppointment } from './actions'
 import type { Barber, Service } from '@/types/database'
+import PhoneInput, { buildPhone, parsePhone, isValidPhone } from '@/components/ui/PhoneInput'
 
 type BookingService = Pick<Service, 'id' | 'name_en' | 'description_en' | 'price' | 'duration_minutes'>
 type BookingBarber  = Pick<Barber,  'id' | 'name' | 'photo_url' | 'is_owner'>
@@ -282,35 +283,6 @@ function DateTimeStep({
 
 // ─── Step 4: Contact details ───────────────────────────────────────────────────
 
-const DIAL_CODES = [
-  { code: '+32',  label: '+32 🇧🇪 BE' },
-  { code: '+31',  label: '+31 🇳🇱 NL' },
-  { code: '+352', label: '+352 🇱🇺 LU' },
-  { code: '+33',  label: '+33 🇫🇷 FR' },
-  { code: '+49',  label: '+49 🇩🇪 DE' },
-  { code: '+1',   label: '+1 🇺🇸 US' },
-]
-
-// Parse a stored full phone (e.g. "+32476000000") back into dialCode + local.
-// Checks longer codes first to avoid "+3" matching "+352".
-function parseStoredPhone(full: string): { dialCode: string; local: string } {
-  const sorted = [...DIAL_CODES].sort((a, b) => b.code.length - a.code.length)
-  for (const { code } of sorted) {
-    if (full.startsWith(code)) return { dialCode: code, local: full.slice(code.length) }
-  }
-  return { dialCode: '+32', local: full }
-}
-
-// Build E.164: strip leading zero from local part (0476... → +32476...)
-function buildPhone(dialCode: string, local: string): string {
-  const stripped = local.replace(/[\s\-\.\(\)]/g, '').replace(/^0+/, '')
-  return `${dialCode}${stripped}`
-}
-
-function isValidPhone(raw: string): boolean {
-  const stripped = raw.replace(/[\s\-\.\(\)]/g, '')
-  return /^\+?[0-9]{9,15}$/.test(stripped)
-}
 
 function ContactStep({
   initialName,
@@ -325,25 +297,20 @@ function ContactStep({
 }) {
   const t = useTranslations('book')
 
-  const parsed = parseStoredPhone(initialPhone)
-  const [name,     setName]     = useState(initialName)
-  const [dialCode, setDialCode] = useState(parsed.dialCode)
-  const [local,    setLocal]    = useState(parsed.local)
+  const [name,       setName]       = useState(initialName)
+  const [phone,      setPhone]      = useState(initialPhone || '+32')
   const [phoneError, setPhoneError] = useState<string | null>(null)
 
-  const INPUT = 'flex-1 rounded-r border border-l-0 border-kob-border bg-kob-black px-3 py-2 text-sm text-kob-white placeholder:text-kob-muted focus:border-kob-red focus:outline-none'
-  const INPUT_ERROR = 'flex-1 rounded-r border border-l-0 border-red-700 bg-kob-black px-3 py-2 text-sm text-kob-white placeholder:text-kob-muted focus:border-red-500 focus:outline-none'
   const LABEL = 'block text-xs font-medium text-kob-muted mb-1'
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const full = buildPhone(dialCode, local)
-    if (!isValidPhone(full)) {
+    if (!isValidPhone(phone)) {
       setPhoneError(t('contact.phoneError'))
       return
     }
     setPhoneError(null)
-    onSubmit(name.trim(), full)
+    onSubmit(name.trim(), phone)
   }
 
   return (
@@ -365,28 +332,12 @@ function ContactStep({
         </div>
         <div>
           <label className={LABEL}>{t('contact.phoneLabel')} *</label>
-          <div className="flex">
-            <select
-              value={dialCode}
-              onChange={(e) => { setDialCode(e.target.value); setPhoneError(null) }}
-              className="rounded-l border border-kob-border bg-kob-surface px-2 py-2 text-sm text-kob-white focus:border-kob-red focus:outline-none shrink-0"
-            >
-              {DIAL_CODES.map(({ code, label }) => (
-                <option key={code} value={code}>{label}</option>
-              ))}
-            </select>
-            <input
-              type="tel"
-              required
-              value={local}
-              onChange={(e) => { setLocal(e.target.value); setPhoneError(null) }}
-              placeholder="476 00 00 00"
-              className={phoneError ? INPUT_ERROR : INPUT}
-            />
-          </div>
-          {phoneError && (
-            <p className="mt-1 text-xs text-red-400">{phoneError}</p>
-          )}
+          <PhoneInput
+            value={phone}
+            onChange={(v) => { setPhone(v); setPhoneError(null) }}
+            error={phoneError}
+            placeholder="476 00 00 00"
+          />
           <p className="mt-1 text-xs text-kob-muted">{t('contact.phoneHint')}</p>
         </div>
         <div className="flex gap-2 pt-2">

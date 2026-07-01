@@ -37,9 +37,9 @@ export default function CancellationFeesClient({ fees }: { fees: FeeRow[] }) {
   return (
     <div>
       <div className="mb-8 flex flex-col gap-1">
-        <h1 className="text-xl font-bold text-kob-white">Late annuleringen</h1>
+        <h1 className="text-xl font-bold text-kob-white">Late cancellations</h1>
         <p className="text-sm text-kob-muted">
-          Openstaand totaal: <span className="text-amber-400 font-semibold">€{totalOpen.toFixed(2)}</span>
+          Outstanding total: <span className="text-amber-400 font-semibold">€{totalOpen.toFixed(2)}</span>
         </p>
       </div>
 
@@ -50,7 +50,7 @@ export default function CancellationFeesClient({ fees }: { fees: FeeRow[] }) {
           onChange={(e) => setFilterBarber(e.target.value)}
           className="border border-kob-border bg-kob-dark px-3 py-2 text-sm text-kob-white focus:border-kob-red focus:outline-none"
         >
-          <option value="all">Alle kappers</option>
+          <option value="all">All barbers</option>
           {barberNames.map((name) => (
             <option key={name} value={name}>{name}</option>
           ))}
@@ -61,14 +61,14 @@ export default function CancellationFeesClient({ fees }: { fees: FeeRow[] }) {
           onChange={(e) => setFilterStatus(e.target.value as 'all' | 'open' | 'paid')}
           className="border border-kob-border bg-kob-dark px-3 py-2 text-sm text-kob-white focus:border-kob-red focus:outline-none"
         >
-          <option value="all">Alle statussen</option>
-          <option value="open">Openstaand</option>
-          <option value="paid">Betaald</option>
+          <option value="all">All statuses</option>
+          <option value="open">Outstanding</option>
+          <option value="paid">Paid</option>
         </select>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-kob-muted text-sm">Geen resultaten gevonden.</p>
+        <p className="text-kob-muted text-sm">No results found.</p>
       ) : (
         <div className="flex flex-col divide-y divide-kob-border border border-kob-border">
           {filtered.map((fee) => (
@@ -109,7 +109,7 @@ function FeeRow({ fee }: { fee: FeeRow }) {
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-medium text-kob-white">{fee.customer_name}</span>
           <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${paid ? 'bg-green-900/40 text-green-400' : 'bg-amber-900/40 text-amber-400'}`}>
-            {paid ? 'Betaald' : 'Openstaand'}
+            {paid ? 'Paid' : 'Outstanding'}
           </span>
         </div>
         <span className="text-sm text-kob-muted">{fee.customer_phone}</span>
@@ -128,7 +128,7 @@ function FeeRow({ fee }: { fee: FeeRow }) {
             disabled={pending}
             className="border border-kob-border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-kob-muted transition-colors hover:border-green-500 hover:text-green-400 disabled:opacity-50"
           >
-            {pending ? '…' : 'Markeer betaald'}
+            {pending ? '…' : 'Mark as paid'}
           </button>
         )}
       </div>

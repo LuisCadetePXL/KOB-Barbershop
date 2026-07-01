@@ -1,9 +1,44 @@
+import type { Metadata } from 'next'
 import { useTranslations } from 'next-intl'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { routing } from '@/i18n/routing'
 import { getGoogleReviews, type PlaceReview } from '@/lib/google-reviews'
 
 type Props = { params: Promise<{ locale: string }> }
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://kobbarbershop.be'
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'home' })
+
+  // hreflang alternates for the homepage across all locales, plus x-default.
+  const languages: Record<string, string> = Object.fromEntries(
+    routing.locales.map((l) => [l, `${BASE_URL}/${l}`]),
+  )
+  languages['x-default'] = `${BASE_URL}/${routing.defaultLocale}`
+
+  const title = 'King of Barber — Leopoldsburg'
+  const description = t('subtitle')
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE_URL}/${locale}`,
+      languages,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/${locale}`,
+      siteName: 'King of Barber',
+      locale,
+      type: 'website',
+    },
+  }
+}
 
 export default async function HomePage({ params }: Props) {
   const { locale } = await params
@@ -43,13 +78,19 @@ function HomeContent() {
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-kob-red">
             {t('location')}
           </p>
-          <h1 className="font-display text-5xl font-bold leading-tight text-kob-white sm:text-7xl lg:text-8xl">
-            {t('heading1')}
-            <br />
-            <span className="text-kob-red">{t('heading2')}</span>
-          </h1>
+          <div className="flex flex-col items-center gap-1">
+            <h1 className="font-display text-5xl font-bold leading-none tracking-widest text-kob-white uppercase sm:text-7xl lg:text-8xl">
+              {t('heading1')} <span className="text-kob-red">{t('heading2')}</span>
+            </h1>
+            <p className="text-sm font-medium uppercase tracking-[0.4em] text-kob-white/50 sm:text-base">
+              {t('headingSub')}
+            </p>
+          </div>
           <p className="max-w-md text-base text-kob-muted sm:text-lg">
             {t('subtitle')}
+          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-kob-white/60">
+            {t('walkIns')}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link

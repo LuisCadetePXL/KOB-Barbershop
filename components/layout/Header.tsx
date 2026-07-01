@@ -25,10 +25,15 @@ export default function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="font-display text-xl font-bold tracking-widest text-kob-white uppercase"
+          className="flex flex-col leading-tight"
           onClick={() => setOpen(false)}
         >
-          KOB <span className="text-kob-red">Barbershop</span>
+          <span className="font-display text-lg font-bold tracking-widest text-kob-white uppercase">
+            KOB <span className="text-kob-red">Belgium</span>
+          </span>
+          <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-kob-muted">
+            King of Barber
+          </span>
         </Link>
 
         {/* Desktop nav */}

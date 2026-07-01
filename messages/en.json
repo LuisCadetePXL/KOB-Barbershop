@@ -9,11 +9,13 @@
   },
   "home": {
     "location": "Leopoldsburg · Belgium",
-    "heading1": "King of",
-    "heading2": "Barber",
+    "heading1": "KOB",
+    "heading2": "Belgium",
+    "headingSub": "King of Barber",
     "subtitle": "Premium cuts, fades and beard work. Crafted by a team that takes pride in every detail.",
     "ctaBook": "Book Now",
     "ctaStory": "Our Story",
+    "walkIns": "Walk-ins welcome. No appointment needed.",
     "scroll": "Scroll",
     "teaserTeam": {
       "title": "Our Team",
@@ -64,6 +66,7 @@
     "mapPlaceholder": "Google Maps",
     "address": "Address",
     "phone": "Phone",
+    "whatsapp": "Available on WhatsApp",
     "instagram": "Instagram",
     "days": {
       "sunday": "Sunday",

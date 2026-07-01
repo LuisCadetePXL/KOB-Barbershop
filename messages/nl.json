@@ -9,11 +9,13 @@
   },
   "home": {
     "location": "Leopoldsburg · België",
-    "heading1": "King of",
-    "heading2": "Barber",
+    "heading1": "KOB",
+    "heading2": "Belgium",
+    "headingSub": "King of Barber",
     "subtitle": "Premium knippen, fades en baardzorg. Vakwerk van een team dat oog heeft voor elk detail.",
     "ctaBook": "Boek nu",
     "ctaStory": "Ons verhaal",
+    "walkIns": "Inlopen welkom. Geen afspraak nodig.",
     "scroll": "Scroll",
     "teaserTeam": {
       "title": "Ons team",
@@ -64,6 +66,7 @@
     "mapPlaceholder": "Google Maps",
     "address": "Adres",
     "phone": "Telefoon",
+    "whatsapp": "Bereikbaar via WhatsApp",
     "instagram": "Instagram",
     "days": {
       "sunday": "Zondag",

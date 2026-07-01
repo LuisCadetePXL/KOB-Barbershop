@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { deleteCalendarEvent, createCalendarEvent } from '@/lib/google-calendar'
 import { sendWhatsApp, barberNotificationMessage, customerConfirmationMessage } from '@/lib/twilio'
+import { requireStaff } from '@/lib/auth'
 
 // ── Available slots (re-exported for admin use) ───────────────────────────────
 
@@ -45,6 +46,8 @@ export async function getAdminAvailableSlots(
 }
 
 export async function cancelAppointment(appointmentId: string): Promise<{ error?: string }> {
+  await requireStaff()
+
   const supabase = await createClient()
 
   // Fetch the appointment to get the linked Calendar event and barber
@@ -85,6 +88,8 @@ export async function cancelAppointment(appointmentId: string): Promise<{ error?
 // ── Admin: check outstanding fees for a phone number ─────────────────────────
 
 export async function checkOutstandingFees(phone: string): Promise<{ totalOwed: number }> {
+  await requireStaff()
+
   const admin = createAdminClient()
   const { data } = await admin
     .from('late_cancellation_fees')
@@ -111,6 +116,8 @@ export interface AdminCreateAppointmentInput {
 export async function createAdminAppointment(
   input: AdminCreateAppointmentInput,
 ): Promise<{ error?: string }> {
+  await requireStaff()
+
   const supabase = await createClient()
   const admin    = createAdminClient()
 
@@ -216,4 +223,27 @@ export async function createAdminAppointment(
 
   revalidatePath('/admin/appointments')
   return {}
+}
+
+// ── Archive old appointments (developer only) ─────────────────────────────────
+
+export async function archiveOldAppointments(): Promise<{ archived: number; error?: string }> {
+  await requireStaff()
+
+  const admin = createAdminClient()
+
+  const cutoff = new Date()
+  cutoff.setMonth(cutoff.getMonth() - 6)
+
+  const { data, error } = await admin
+    .from('appointments')
+    .update({ status: 'archived' })
+    .in('status', ['confirmed', 'cancelled'])
+    .lt('start_time', cutoff.toISOString())
+    .select('id')
+
+  if (error) return { archived: 0, error: error.message }
+
+  revalidatePath('/admin/appointments')
+  return { archived: data?.length ?? 0 }
 }

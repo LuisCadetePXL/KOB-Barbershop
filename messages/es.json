@@ -9,11 +9,13 @@
   },
   "home": {
     "location": "Leopoldsburg · Bélgica",
-    "heading1": "King of",
-    "heading2": "Barber",
+    "heading1": "KOB",
+    "heading2": "Belgium",
+    "headingSub": "King of Barber",
     "subtitle": "Cortes premium, fades y arreglo de barba. Trabajo artesanal de un equipo que cuida cada detalle.",
     "ctaBook": "Reservar",
     "ctaStory": "Nuestra historia",
+    "walkIns": "Se aceptan clientes sin cita. No es necesaria una cita.",
     "scroll": "Desplazar",
     "teaserTeam": {
       "title": "Nuestro equipo",
@@ -64,6 +66,7 @@
     "mapPlaceholder": "Google Maps",
     "address": "Dirección",
     "phone": "Teléfono",
+    "whatsapp": "Disponible en WhatsApp",
     "instagram": "Instagram",
     "days": {
       "sunday": "Domingo",
