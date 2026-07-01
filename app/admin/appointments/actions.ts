@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { deleteCalendarEvent, createCalendarEvent } from '@/lib/google-calendar'
-import { sendWhatsApp, barberNotificationMessage } from '@/lib/twilio'
+import { sendWhatsApp, barberNotificationMessage, customerConfirmationMessage } from '@/lib/twilio'
 
 // ── Available slots (re-exported for admin use) ───────────────────────────────
 
@@ -172,15 +172,16 @@ export async function createAdminAppointment(
     }
   }
 
-  // WhatsApp barber notification (with debt warning if applicable)
-  if (barber?.whatsapp_number) {
-    const { data: openFees } = await admin
-      .from('late_cancellation_fees')
-      .select('amount_owed')
-      .eq('customer_phone', input.customerPhone.trim())
-      .is('paid_at', null)
-    const totalOwed = (openFees ?? []).reduce((sum, f) => sum + Number(f.amount_owed), 0)
+  // Outstanding fees (needed for both barber and customer messages)
+  const { data: openFees } = await admin
+    .from('late_cancellation_fees')
+    .select('amount_owed')
+    .eq('customer_phone', input.customerPhone.trim())
+    .is('paid_at', null)
+  const totalOwed = (openFees ?? []).reduce((sum, f) => sum + Number(f.amount_owed), 0)
 
+  // WhatsApp barber notification
+  if (barber?.whatsapp_number) {
     let msg = barberNotificationMessage({
       customerName:  input.customerName.trim(),
       serviceName,
@@ -192,6 +193,25 @@ export async function createAdminAppointment(
       msg += `\n\n⚠️ Let op: deze klant heeft nog een openstaande schuld van €${totalOwed.toFixed(2)} van een eerdere te-late annulering.`
     }
     await sendWhatsApp(barber.whatsapp_number, msg)
+  }
+
+  // WhatsApp customer confirmation
+  const customerPhone = input.customerPhone.trim()
+  if (customerPhone.startsWith('+')) {
+    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://kobbarbershop.be'
+    const cancelUrl = `${siteUrl}/nl/cancel/${cancelToken}`
+    let customerMsg = customerConfirmationMessage({
+      customerName: input.customerName.trim(),
+      serviceName,
+      barberName:   barber?.name ?? 'uw barber',
+      date:         input.date,
+      time:         input.time,
+      cancelUrl,
+    })
+    if (totalOwed > 0) {
+      customerMsg += `\n\n⚠️ Opgelet: je hebt nog een openstaande schuld van €${totalOwed.toFixed(2)} van een eerdere te late annulering. Gelieve dit bedrag mee te brengen en te betalen bij aanvang van je afspraak.`
+    }
+    await sendWhatsApp(customerPhone, customerMsg)
   }
 
   revalidatePath('/admin/appointments')
