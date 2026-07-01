@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/admin/opening-hours',label: 'Opening Hours',  icon: '🕐' },
   { href: '/admin/closed-dates',        label: 'Closed Dates',  icon: '🚫' },
   { href: '/admin/breaks',               label: 'Breaks',        icon: '⏸' },
+  { href: '/admin/recurring-clients',    label: 'Recurring',     icon: '🔁' },
   { href: '/admin/cancellation-fees',   label: 'Late Cancels',  icon: '💶' },
   { href: '/admin/settings',            label: 'Settings',      icon: '⚙️' },
   { href: '/admin/integrations',        label: 'Integrations',  icon: '⚙' },

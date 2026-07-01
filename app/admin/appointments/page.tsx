@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export type AppointmentRow = {
   id: string
   status: 'confirmed' | 'cancelled'
-  source: 'website' | 'external'
+  source: 'website' | 'external' | 'recurring'
   start_time: string
   end_time: string
   customer_name: string

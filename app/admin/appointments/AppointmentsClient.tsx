@@ -35,11 +35,18 @@ function formatDate(iso: string) {
 
 // ── Badges ────────────────────────────────────────────────────────────────────
 
-function SourceBadge({ source }: { source: 'website' | 'external' }) {
+function SourceBadge({ source }: { source: 'website' | 'external' | 'recurring' }) {
   if (source === 'external') {
     return (
       <span className="inline-block rounded-full border border-amber-700 bg-amber-900/20 px-2 py-0.5 text-[10px] uppercase tracking-widest text-amber-400">
         Phone
+      </span>
+    )
+  }
+  if (source === 'recurring') {
+    return (
+      <span className="inline-block rounded-full border border-blue-800 bg-blue-900/20 px-2 py-0.5 text-[10px] uppercase tracking-widest text-blue-400">
+        Recurring
       </span>
     )
   }
