@@ -1,5 +1,11 @@
 -- Migration: 0012_breaks
+-- Also adds optional notes column to appointments (used by admin booking form).
 -- Adds barber_breaks table and updates get_available_slots to exclude break slots.
+
+-- ── Notes column on appointments ─────────────────────────────────────────────
+
+alter table public.appointments
+  add column if not exists notes text;
 
 -- ── Table ────────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import AppointmentsClient from './AppointmentsClient'
-
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export type AppointmentRow = {
@@ -18,11 +17,19 @@ export type AppointmentRow = {
   hasDebt?: boolean
 }
 
+export type BarberOption  = { id: string; name: string }
+export type ServiceOption = { id: string; name_en: string; duration_minutes: number }
+
 export default async function AppointmentsPage() {
   const supabase = await createClient()
   const admin    = createAdminClient()
 
-  const [{ data: appointments }, { data: openFees }] = await Promise.all([
+  const [
+    { data: appointments },
+    { data: openFees },
+    { data: barbers },
+    { data: services },
+  ] = await Promise.all([
     supabase
       .from('appointments')
       .select('id, status, source, start_time, end_time, customer_name, customer_phone, google_calendar_event_id, created_at, barbers(name), services(name_en)')
@@ -32,14 +39,29 @@ export default async function AppointmentsPage() {
       .from('late_cancellation_fees')
       .select('customer_phone')
       .is('paid_at', null),
+    supabase
+      .from('barbers')
+      .select('id, name')
+      .eq('active', true)
+      .order('name'),
+    supabase
+      .from('services')
+      .select('id, name_en, duration_minutes')
+      .eq('active', true)
+      .order('name_en'),
   ])
 
   const debtPhones = new Set((openFees ?? []).map((f) => f.customer_phone))
-
   const enriched = (appointments ?? []).map((a) => ({
     ...a,
     hasDebt: debtPhones.has(a.customer_phone),
   }))
 
-  return <AppointmentsClient appointments={enriched as unknown as AppointmentRow[]} />
+  return (
+    <AppointmentsClient
+      appointments={enriched as unknown as AppointmentRow[]}
+      barbers={(barbers ?? []) as BarberOption[]}
+      services={(services ?? []) as ServiceOption[]}
+    />
+  )
 }
