@@ -81,6 +81,37 @@ export async function createAppointment(
     return { error: 'Phone number is invalid. Please use an international format, e.g. +32 476 00 00 00.' }
   }
 
+  const admin = createAdminClient()
+
+  // Look up the real service duration server-side. Never trust the client-supplied
+  // input.durationMinutes — it could be tampered with to mis-size the booked slot
+  // (e.g. a 1-minute booking that fails to block the following slots).
+  const { data: serviceRow, error: serviceError } = await admin
+    .from('services')
+    .select('name_en, duration_minutes')
+    .eq('id', input.serviceId)
+    .single()
+
+  if (serviceError || !serviceRow) {
+    return { error: 'Selected service could not be found.' }
+  }
+  const durationMinutes = serviceRow.duration_minutes
+
+  // Lightweight rate limit: reject if more than 3 appointments were already created
+  // for this phone number in the last 10 minutes. Prevents booking-spam without an
+  // external service. (appointments has no public SELECT policy, so this must run
+  // via the admin client.)
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+  const { count: recentCount } = await admin
+    .from('appointments')
+    .select('id', { count: 'exact', head: true })
+    .eq('customer_phone', input.customerPhone.trim())
+    .gte('created_at', tenMinutesAgo)
+
+  if ((recentCount ?? 0) > 3) {
+    return { error: 'Te veel boekingen. Probeer later opnieuw.' }
+  }
+
   const appointmentId = randomUUID()
   const cancelToken   = randomUUID()
 
@@ -94,7 +125,7 @@ export async function createAppointment(
   const brusselsAsUtc = new Date(brusselsString.replace(' ', 'T') + 'Z')
   const offsetMs = brusselsAsUtc.getTime() - naiveUtc.getTime()
   const startTime = new Date(naiveUtc.getTime() - offsetMs)
-  const endTime   = new Date(startTime.getTime() + input.durationMinutes * 60_000)
+  const endTime   = new Date(startTime.getTime() + durationMinutes * 60_000)
 
   const { error } = await supabase
     .from('appointments')
@@ -116,13 +147,13 @@ export async function createAppointment(
     return { error: error.message }
   }
 
-  const admin = createAdminClient()
-  const [{ data: barber }, { data: service }] = await Promise.all([
-    admin.from('barbers').select('name, google_calendar_id, whatsapp_number').eq('id', input.barberId).single(),
-    admin.from('services').select('name_en').eq('id', input.serviceId).single(),
-  ])
+  const { data: barber } = await admin
+    .from('barbers')
+    .select('name, google_calendar_id, whatsapp_number')
+    .eq('id', input.barberId)
+    .single()
 
-  const serviceName = service?.name_en ?? 'Afspraak'
+  const serviceName = serviceRow.name_en ?? 'Afspraak'
   const barberName  = barber?.name ?? 'Kapper'
 
   if (barber?.google_calendar_id) {

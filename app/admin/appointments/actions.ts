@@ -50,17 +50,24 @@ export async function cancelAppointment(appointmentId: string): Promise<{ error?
 
   const supabase = await createClient()
 
-  // Fetch the appointment to get the linked Calendar event and barber
-  const { data: appt, error: fetchErr } = await supabase
+  // Atomically claim the cancellation: only the request that flips a still-'confirmed'
+  // row proceeds. A concurrent double-click updates 0 rows and bails out, so the
+  // Calendar event is never deleted twice. Returned columns feed the cleanup below.
+  const { data: cancelledRows, error } = await supabase
     .from('appointments')
-    .select('id, status, google_calendar_event_id, barber_id')
+    .update({ status: 'cancelled' })
     .eq('id', appointmentId)
-    .single()
+    .eq('status', 'confirmed')
+    .select('id, google_calendar_event_id, barber_id')
 
-  if (fetchErr || !appt) return { error: 'Appointment not found.' }
-  if (appt.status === 'cancelled') return { error: 'Already cancelled.' }
+  if (error) return { error: error.message }
+  if (!cancelledRows || cancelledRows.length === 0) {
+    return { error: 'Already cancelled.' }
+  }
 
-  // Delete the linked Google Calendar event (if one exists)
+  const appt = cancelledRows[0]
+
+  // Delete the linked Google Calendar event (best-effort, after the claim)
   if (appt.google_calendar_event_id) {
     const admin = createAdminClient()
     const { data: barber } = await admin
@@ -73,13 +80,6 @@ export async function cancelAppointment(appointmentId: string): Promise<{ error?
       await deleteCalendarEvent(barber.google_calendar_id, appt.google_calendar_event_id)
     }
   }
-
-  const { error } = await supabase
-    .from('appointments')
-    .update({ status: 'cancelled' })
-    .eq('id', appointmentId)
-
-  if (error) return { error: error.message }
 
   revalidatePath('/admin/appointments')
   return {}

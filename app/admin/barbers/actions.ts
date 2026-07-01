@@ -3,7 +3,23 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 
-async function uploadAvatar(supabase: Awaited<ReturnType<typeof createClient>>, id: string, photo: File): Promise<string | null> {
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024 // 5 MB
+const ALLOWED_AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp']
+
+async function uploadAvatar(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  id: string,
+  photo: File,
+): Promise<{ url?: string; error?: string }> {
+  // Validate before touching storage. The client `accept` attribute is cosmetic
+  // and bypassable, so type/size must be enforced server-side.
+  if (!ALLOWED_AVATAR_TYPES.includes(photo.type)) {
+    return { error: 'Invalid image type. Use PNG, JPEG or WebP.' }
+  }
+  if (photo.size > MAX_AVATAR_BYTES) {
+    return { error: 'Image too large. Maximum size is 5 MB.' }
+  }
+
   // Delete existing first to avoid relying on the upsert UPDATE policy path
   await supabase.storage.from('avatars').remove([`${id}.png`])
 
@@ -11,18 +27,18 @@ async function uploadAvatar(supabase: Awaited<ReturnType<typeof createClient>>, 
   const { error } = await supabase.storage
     .from('avatars')
     .upload(`${id}.png`, bytes, {
-      contentType: photo.type || 'image/png',
+      contentType: photo.type, // validated against ALLOWED_AVATAR_TYPES above
       // max-age=1 prevents CDN from caching — ensures the new file is served
       // immediately after upload without needing cache-busting query params
       cacheControl: '1',
     })
 
-  if (error) return null
+  if (error) return { error: 'Photo upload failed.' }
 
   const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(`${id}.png`)
   // Append timestamp so the browser always treats each upload as a new URL,
   // bypassing its own cache even when the storage path stays the same
-  return `${publicUrl}?t=${Date.now()}`
+  return { url: `${publicUrl}?t=${Date.now()}` }
 }
 
 export async function addBarber(
@@ -44,9 +60,9 @@ export async function addBarber(
 
   const photo = formData.get('photo') as File | null
   if (photo && photo.size > 0) {
-    const publicUrl = await uploadAvatar(supabase, data.id, photo)
-    if (!publicUrl) return { error: 'Barber added, but photo upload failed. You can retry via Edit.' }
-    await supabase.from('barbers').update({ photo_url: publicUrl }).eq('id', data.id)
+    const uploaded = await uploadAvatar(supabase, data.id, photo)
+    if (uploaded.error) return { error: `Barber added, but the photo was rejected: ${uploaded.error} You can retry via Edit.` }
+    await supabase.from('barbers').update({ photo_url: uploaded.url }).eq('id', data.id)
   }
 
   revalidatePath('/admin/barbers')
@@ -75,9 +91,9 @@ export async function updateBarber(
   } else {
     const photo = formData.get('photo') as File | null
     if (photo && photo.size > 0) {
-      const publicUrl = await uploadAvatar(supabase, id, photo)
-      if (!publicUrl) return { error: 'Photo upload failed. Name and status were saved.' }
-      updates.photo_url = publicUrl
+      const uploaded = await uploadAvatar(supabase, id, photo)
+      if (uploaded.error) return { error: uploaded.error }
+      updates.photo_url = uploaded.url
     }
   }
 

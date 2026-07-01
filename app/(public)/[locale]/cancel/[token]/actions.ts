@@ -38,7 +38,10 @@ export async function cancelAppointment(token: string): Promise<CancelResult> {
 
   const cancellationType = isLate ? 'late' : 'on_time'
 
-  const { error: updateError } = await admin
+  // Conditional update acts as an atomic lock: only the request that flips a
+  // still-'confirmed' row proceeds. A concurrent double-submit updates 0 rows and
+  // bails out here, so we never insert a duplicate fee or send a duplicate notice.
+  const { data: updatedRows, error: updateError } = await admin
     .from('appointments')
     .update({
       status:            'cancelled',
@@ -46,8 +49,13 @@ export async function cancelAppointment(token: string): Promise<CancelResult> {
       cancellation_type: cancellationType,
     })
     .eq('id', appt.id)
+    .eq('status', 'confirmed')
+    .select('id')
 
   if (updateError) return { status: 'error', message: updateError.message }
+  if (!updatedRows || updatedRows.length === 0) {
+    return { status: 'error', message: 'already_cancelled' }
+  }
 
   const barber  = Array.isArray(appt.barbers)  ? appt.barbers[0]  : appt.barbers  as { name: string; whatsapp_number: string | null; google_calendar_id: string | null } | null
   const service = Array.isArray(appt.services) ? appt.services[0] : appt.services as { name_en: string; price: number } | null
