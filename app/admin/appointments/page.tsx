@@ -47,7 +47,6 @@ export default async function AppointmentsPage() {
     supabase
       .from('services')
       .select('id, name_en, duration_minutes')
-      .eq('active', true)
       .order('name_en'),
   ])
 

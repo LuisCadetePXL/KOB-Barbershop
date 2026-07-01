@@ -7,6 +7,43 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { deleteCalendarEvent, createCalendarEvent } from '@/lib/google-calendar'
 import { sendWhatsApp, barberNotificationMessage } from '@/lib/twilio'
 
+// ── Available slots (re-exported for admin use) ───────────────────────────────
+
+export async function getAdminAvailableSlots(
+  barberId: string,
+  date: string,
+  durationMinutes: number,
+): Promise<{ slots: string[]; closed: boolean }> {
+  const supabase = await createClient()
+
+  const { data: closedRows } = await supabase
+    .from('closed_dates')
+    .select('id')
+    .eq('date', date)
+    .or(`barber_id.is.null,barber_id.eq.${barberId}`)
+    .limit(1)
+
+  if (closedRows && closedRows.length > 0) return { slots: [], closed: true }
+
+  const dayOfWeek = new Date(date + 'T12:00:00Z').getDay()
+  const { data: hours } = await supabase
+    .from('opening_hours')
+    .select('closed')
+    .eq('day_of_week', dayOfWeek)
+    .single()
+
+  if (!hours || hours.closed) return { slots: [], closed: true }
+
+  const { data: slots, error } = await supabase.rpc('get_available_slots', {
+    p_barber_id: barberId,
+    p_date: date,
+    p_duration_mins: durationMinutes,
+  })
+
+  if (error) return { slots: [], closed: false }
+  return { slots: (slots as string[]) ?? [], closed: false }
+}
+
 export async function cancelAppointment(appointmentId: string): Promise<{ error?: string }> {
   const supabase = await createClient()
 

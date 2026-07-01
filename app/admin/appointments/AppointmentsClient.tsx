@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { cancelAppointment, createAdminAppointment, checkOutstandingFees } from './actions'
-import { getAvailableSlots } from '@/app/(public)/[locale]/book/actions'
+import { cancelAppointment, createAdminAppointment, checkOutstandingFees, getAdminAvailableSlots } from './actions'
 import type { AppointmentRow, BarberOption, ServiceOption } from './page'
 
 const BTN_PRIMARY =
@@ -167,7 +166,7 @@ function NewAppointmentForm({
     }
     setSlotsLoading(true)
     setTime('')
-    getAvailableSlots(barberId, date, selectedService.duration_minutes).then(({ slots, closed }) => {
+    getAdminAvailableSlots(barberId, date, selectedService.duration_minutes).then(({ slots, closed }) => {
       setSlots(slots)
       setSlotsClosed(closed)
       setSlotsLoading(false)
