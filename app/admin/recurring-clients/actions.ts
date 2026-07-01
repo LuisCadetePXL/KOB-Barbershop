@@ -50,8 +50,14 @@ export async function addRecurringClient(_: unknown, formData: FormData) {
 
   if (insertError) return { error: insertError.message }
 
+  console.log('[KOB Recurring] client inserted:', client?.id)
+  console.log('[KOB Recurring] client.service_id:', client?.service_id)
+  console.log('[KOB Recurring] client.services:', JSON.stringify(client?.services))
+  console.log('[KOB Recurring] client.barbers:', JSON.stringify(client?.barbers))
+
   // Generate appointments for the next 3 months immediately
-  await generateAppointmentsForClient(client as any, admin)
+  const result = await generateAppointmentsForClient(client as any, admin)
+  console.log('[KOB Recurring] generate result:', JSON.stringify(result))
 
   revalidatePath('/admin/recurring-clients')
   revalidatePath('/admin/appointments')

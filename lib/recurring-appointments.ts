@@ -187,27 +187,31 @@ export async function generateAppointmentsForClient(
   admin: SupabaseClient,
   horizonMonths = 3,
 ): Promise<GenerateResult> {
+  console.log(`[KOB Gen] start client=${client.id} pattern=${client.pattern_type} dow=${client.day_of_week} service_id=${client.service_id}`)
+
   if (!client.service_id || !client.services) {
+    console.log('[KOB Gen] early return — no service_id or services join is null')
     return { created: 0, skipped: 0, conflicts: 0 }
   }
 
   const today   = brusselsTodayStr()
   const horizon = addMonthsStr(today, horizonMonths)
   const timeHHMM = client.start_time.slice(0, 5)
+  console.log(`[KOB Gen] today=${today} horizon=${horizon} time=${timeHHMM} duration=${client.services.duration_minutes}min`)
 
   // Fetch all existing appointments for this client (for dedup + anchor)
-  const { data: existing } = await admin
+  const { data: existing, error: existingErr } = await admin
     .from('appointments')
     .select('id, start_time')
     .eq('recurring_client_id', client.id)
     .order('start_time', { ascending: true })
 
-  // Normalize existing start_times to UTC ISO strings for exact matching
+  console.log(`[KOB Gen] existing appointments: ${existing?.length ?? 0}, err=${existingErr?.message ?? 'none'}`)
+
   const existingStartTimes = new Set(
     (existing ?? []).map((a) => new Date(a.start_time).toISOString()),
   )
 
-  // Determine anchor for biweekly/triweekly phase
   let anchorDateStr: string | null = null
   if (existing && existing.length > 0) {
     anchorDateStr = new Intl.DateTimeFormat('sv-SE', {
@@ -224,6 +228,7 @@ export async function generateAppointmentsForClient(
     today,
     horizon,
   )
+  console.log(`[KOB Gen] generated ${dates.length} dates: ${dates.slice(0, 5).join(', ')}${dates.length > 5 ? '…' : ''}`)
 
   let created   = 0
   let skipped   = 0
@@ -233,13 +238,11 @@ export async function generateAppointmentsForClient(
     const startUTC = brusselsToUTC(dateStr, timeHHMM)
     const endUTC   = new Date(startUTC.getTime() + client.services.duration_minutes * 60_000)
 
-    // Dedup: already created for this client at this time?
     if (existingStartTimes.has(startUTC.toISOString())) {
       skipped++
       continue
     }
 
-    // Conflict: any OTHER confirmed appointment for this barber at this time?
     const { data: conflicting } = await admin
       .from('appointments')
       .select('id')
@@ -250,6 +253,7 @@ export async function generateAppointmentsForClient(
       .limit(1)
 
     if (conflicting && conflicting.length > 0) {
+      console.log(`[KOB Gen] conflict on ${dateStr}`)
       conflicts++
       if (client.barbers?.whatsapp_number) {
         const dateFormatted = new Date(dateStr + 'T12:00:00Z').toLocaleDateString('nl-BE', {
@@ -269,11 +273,10 @@ export async function generateAppointmentsForClient(
       continue
     }
 
-    // Create appointment
     const appointmentId = randomUUID()
     const cancelToken   = randomUUID()
 
-    const { error } = await admin.from('appointments').insert({
+    const { error: insertErr } = await admin.from('appointments').insert({
       id:                  appointmentId,
       barber_id:           client.barber_id,
       service_id:          client.service_id,
@@ -287,9 +290,11 @@ export async function generateAppointmentsForClient(
       recurring_client_id: client.id,
     })
 
-    if (error) continue
+    if (insertErr) {
+      console.log(`[KOB Gen] insert error on ${dateStr}: ${insertErr.message}`)
+      continue
+    }
 
-    // Google Calendar event (best-effort)
     if (client.barbers?.google_calendar_id) {
       const calEventId = await createCalendarEvent({
         calendarId:    client.barbers.google_calendar_id,
@@ -307,9 +312,9 @@ export async function generateAppointmentsForClient(
     }
 
     created++
-    // Add to set so we don't re-create within the same run
     existingStartTimes.add(startUTC.toISOString())
   }
 
+  console.log(`[KOB Gen] done: created=${created} skipped=${skipped} conflicts=${conflicts}`)
   return { created, skipped, conflicts }
 }
